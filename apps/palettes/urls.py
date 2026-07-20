@@ -1,9 +1,14 @@
 from django.urls import path
-from django.views.generic import TemplateView
 
 from .views import (
+    ApplyPresetView,
+    MyPaletteListView,
     PaletteCreateView,
+    PaletteDeleteView,
+    PaletteDetailView,
+    PaletteDuplicateView,
     PaletteUpdateView,
+    PresetPaletteListView,
 )
 
 
@@ -17,34 +22,38 @@ urlpatterns = [
         name="editor",
     ),
     path(
+        "my-palettes/",
+        MyPaletteListView.as_view(),
+        name="my_palettes",
+    ),
+    path(
+        "presets/",
+        PresetPaletteListView.as_view(),
+        name="presets",
+    ),
+    path(
+        "presets/<slug:slug>/apply/",
+        ApplyPresetView.as_view(),
+        name="apply_preset",
+    ),
+    path(
         "<slug:slug>/edit/",
         PaletteUpdateView.as_view(),
         name="edit",
     ),
     path(
-        "my-palettes/",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "My Palettes",
-                "page_message": (
-                    "Your saved palettes will appear here."
-                ),
-            },
-        ),
-        name="my_palettes",
+        "<slug:slug>/duplicate/",
+        PaletteDuplicateView.as_view(),
+        name="duplicate",
     ),
     path(
-        "presets/",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "Preset Palettes",
-                "page_message": (
-                    "Browse professional preset colour systems."
-                ),
-            },
-        ),
-        name="presets",
+        "<slug:slug>/delete/",
+        PaletteDeleteView.as_view(),
+        name="delete",
+    ),
+    path(
+        "<slug:slug>/",
+        PaletteDetailView.as_view(),
+        name="detail",
     ),
 ]

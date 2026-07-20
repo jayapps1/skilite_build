@@ -1,52 +1,478 @@
 {% extends "base/base.html" %}
+{% load static %}
 
 {% block title %}
-    Skilite Build | Create, Preview and Export
+    Skilite Build | Create Professional Website Colours
 {% endblock %}
 
 {% block content %}
-<section class="section-padding">
-    <div class="container py-5">
-        <div class="text-center mx-auto" style="max-width: 760px;">
-            <div class="sk-icon mb-3">
-                <i class="fa-solid fa-palette"></i>
+
+<section class="home-hero">
+    <div class="container">
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-6">
+                <span class="hero-badge">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Professional website colour systems
+                </span>
+
+                <h1>
+                    Build website colours that
+                    <span>work together.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Create, preview, save, and export complete
+                    semantic colour palettes for real websites.
+                    Start manually or generate a professional
+                    recommendation for your business.
+                </p>
+
+                <div class="hero-actions">
+                    <a
+                        href="{% url 'palettes:editor' %}"
+                        class="btn btn-primary btn-lg"
+                    >
+                        <i class="fa-solid fa-palette me-2"></i>
+                        Start building
+                    </a>
+
+                    <a
+                        href="{% url 'recommendations:index' %}"
+                        class="btn btn-outline-primary btn-lg"
+                    >
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>
+                        Get recommendation
+                    </a>
+                </div>
+
+                <div class="hero-statistics">
+                    <div>
+                        <strong>{{ semantic_role_count }}</strong>
+                        <span>Semantic roles</span>
+                    </div>
+
+                    <div>
+                        <strong>{{ preset_count }}</strong>
+                        <span>Professional presets</span>
+                    </div>
+
+                    <div>
+                        <strong>{{ category_count }}+</strong>
+                        <span>Business categories</span>
+                    </div>
+                </div>
             </div>
 
-            <h1 class="display-4 fw-bold mb-3">
-                Skilite Build
-            </h1>
+            <div class="col-lg-6">
+                <div class="hero-preview-card">
 
-            <p class="lead sk-text-muted mb-4">
-                Create, preview, save, export and share professional
-                website colour systems.
+                    <div class="preview-browser-toolbar">
+                        <div class="browser-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                        <div class="browser-address">
+                            yourbusiness.com
+                        </div>
+                    </div>
+
+                    <div class="hero-business-preview">
+                        <nav>
+                            <strong>NovaTech</strong>
+
+                            <div>
+                                <span>Home</span>
+                                <span>Services</span>
+                                <span>Contact</span>
+                            </div>
+                        </nav>
+
+                        <section>
+                            <span class="preview-label">
+                                Modern digital solutions
+                            </span>
+
+                            <h2>
+                                Build smarter technology
+                            </h2>
+
+                            <p>
+                                A live website preview powered by
+                                semantic colour roles.
+                            </p>
+
+                            <button type="button">
+                                Get started
+                            </button>
+                        </section>
+
+                        <div class="hero-preview-cards">
+                            <article>
+                                <i class="fa-solid fa-code"></i>
+                                <strong>Development</strong>
+                            </article>
+
+                            <article>
+                                <i class="fa-solid fa-cloud"></i>
+                                <strong>Cloud</strong>
+                            </article>
+
+                            <article>
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <strong>Security</strong>
+                            </article>
+                        </div>
+                    </div>
+
+                    <div class="hero-colour-strip">
+                        <span style="background:#2563EB;"></span>
+                        <span style="background:#64748B;"></span>
+                        <span style="background:#F59E0B;"></span>
+                        <span style="background:#F8FAFC;"></span>
+                        <span style="background:#FFFFFF;"></span>
+                        <span style="background:#0F172A;"></span>
+                        <span style="background:#334155;"></span>
+                        <span style="background:#16A34A;"></span>
+                        <span style="background:#DC2626;"></span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="home-section how-it-works-section">
+    <div class="container">
+
+        <div class="section-heading centered-heading">
+            <span class="section-eyebrow">
+                Simple workflow
+            </span>
+
+            <h2>
+                From idea to website-ready palette
+            </h2>
+
+            <p>
+                Skilite Build turns colour selection into a clear,
+                practical workflow.
             </p>
+        </div>
 
-            <div class="d-flex justify-content-center gap-2 flex-wrap">
+        <div class="workflow-grid">
+            <article class="workflow-card">
+                <span class="workflow-number">01</span>
+
+                <div class="workflow-icon">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+
+                <h3>Choose your direction</h3>
+
+                <p>
+                    Select a business category, theme, mood,
+                    design style, and preferred colours.
+                </p>
+            </article>
+
+            <article class="workflow-card">
+                <span class="workflow-number">02</span>
+
+                <div class="workflow-icon">
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+
+                <h3>Preview the website</h3>
+
+                <p>
+                    See every colour applied to navigation,
+                    headings, buttons, cards, text, and alerts.
+                </p>
+            </article>
+
+            <article class="workflow-card">
+                <span class="workflow-number">03</span>
+
+                <div class="workflow-icon">
+                    <i class="fa-solid fa-code"></i>
+                </div>
+
+                <h3>Save and prepare</h3>
+
+                <p>
+                    Save the complete semantic system and prepare
+                    it for CSS, Bootstrap, React, or mobile use.
+                </p>
+            </article>
+        </div>
+
+    </div>
+</section>
+
+<section class="home-section feature-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-5">
+                <span class="section-eyebrow">
+                    Complete colour systems
+                </span>
+
+                <h2 class="section-title">
+                    More than a row of attractive colours
+                </h2>
+
+                <p class="section-description">
+                    Every palette includes defined roles for
+                    interface components, typography, surfaces,
+                    borders, and application feedback.
+                </p>
+
                 <a
                     href="{% url 'palettes:editor' %}"
                     class="btn btn-primary"
                 >
-                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i>
-                    Start Creating
+                    Open the editor
+                </a>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="semantic-role-grid">
+                    <article>
+                        <span style="background:#2563EB;"></span>
+                        <strong>Primary</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#64748B;"></span>
+                        <strong>Secondary</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#F59E0B;"></span>
+                        <strong>Accent</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#F8FAFC;"></span>
+                        <strong>Background</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#FFFFFF;"></span>
+                        <strong>Surface</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#0F172A;"></span>
+                        <strong>Heading</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#334155;"></span>
+                        <strong>Body text</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#64748B;"></span>
+                        <strong>Muted text</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#E2E8F0;"></span>
+                        <strong>Border</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#16A34A;"></span>
+                        <strong>Success</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#D97706;"></span>
+                        <strong>Warning</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#DC2626;"></span>
+                        <strong>Danger</strong>
+                    </article>
+
+                    <article>
+                        <span style="background:#0284C7;"></span>
+                        <strong>Information</strong>
+                    </article>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="home-section categories-section">
+    <div class="container">
+
+        <div class="section-heading centered-heading">
+            <span class="section-eyebrow">
+                Business-aware previews
+            </span>
+
+            <h2>
+                Designed for different industries
+            </h2>
+
+            <p>
+                The preview content changes with the selected
+                business category while keeping one reusable layout.
+            </p>
+        </div>
+
+        <div class="category-grid">
+            {% for category in featured_categories %}
+                <article class="category-card">
+                    <div class="category-icon">
+                        <i class="{{ category.icon }}"></i>
+                    </div>
+
+                    <h3>{{ category.name }}</h3>
+
+                    <p>
+                        {% if category.description %}
+                            {{ category.description|truncatechars:90 }}
+                        {% else %}
+                            Professional website colour guidance
+                            for {{ category.name|lower }} businesses.
+                        {% endif %}
+                    </p>
+                </article>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<section class="home-section preset-showcase-section">
+    <div class="container">
+
+        <div class="section-heading heading-with-action">
+            <div>
+                <span class="section-eyebrow">
+                    Ready-made inspiration
+                </span>
+
+                <h2>
+                    Professional preset palettes
+                </h2>
+
+                <p>
+                    Start with a complete palette and customize
+                    it inside the editor.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'palettes:presets' %}"
+                class="btn btn-outline-primary"
+            >
+                Browse all presets
+            </a>
+        </div>
+
+        <div class="home-preset-grid">
+            {% for preset in featured_presets %}
+                <article class="home-preset-card">
+                    <div class="home-preset-strip">
+                        {% for color in preset.colors.all %}
+                            <span
+                                style="background-color: {{ color.hex_value }};"
+                                title="{{ color.get_role_display }}: {{ color.hex_value }}"
+                            ></span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="home-preset-content">
+                        <div>
+                            <span class="preset-category">
+                                {% if preset.business_category %}
+                                    {{ preset.business_category.name }}
+                                {% else %}
+                                    General
+                                {% endif %}
+                            </span>
+
+                            <h3>{{ preset.name }}</h3>
+
+                            <p>
+                                {{ preset.description|truncatechars:100 }}
+                            </p>
+                        </div>
+
+                        <a
+                            href="{% url 'palettes:presets' %}"
+                            class="btn btn-sm btn-outline-primary"
+                        >
+                            View preset
+                        </a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-home-data">
+                    <i class="fa-solid fa-palette"></i>
+
+                    <p>
+                        Run the palette-template seeder to display
+                        professional presets here.
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<section class="home-section home-cta-section">
+    <div class="container">
+        <div class="home-cta-card">
+
+            <div>
+                <span class="cta-badge">
+                    Start building today
+                </span>
+
+                <h2>
+                    Create a colour system for your next website.
+                </h2>
+
+                <p>
+                    Start manually, apply a professional preset,
+                    or generate a recommendation for your business.
+                </p>
+            </div>
+
+            <div class="home-cta-actions">
+                <a
+                    href="{% url 'palettes:editor' %}"
+                    class="btn btn-light btn-lg"
+                >
+                    Create palette
                 </a>
 
                 <a
                     href="{% url 'recommendations:index' %}"
-                    class="btn btn-outline-primary"
+                    class="btn btn-outline-light btn-lg"
                 >
-                    <i class="fa-solid fa-lightbulb me-2"></i>
-                    Recommendations
-                </a>
-
-                <a
-                    href="{% url 'community:gallery' %}"
-                    class="btn btn-outline-secondary"
-                >
-                    <i class="fa-solid fa-layer-group me-2"></i>
-                    Community Gallery
+                    Get recommendation
                 </a>
             </div>
+
         </div>
     </div>
 </section>
+
 {% endblock %}

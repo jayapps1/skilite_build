@@ -1,0 +1,43 @@
+{% if messages %}
+    <div class="container skilite-message-container">
+        {% for message in messages %}
+            <div
+                class="alert
+                {% if message.tags == 'error' %}
+                    alert-danger
+                {% elif message.tags == 'success' %}
+                    alert-success
+                {% elif message.tags == 'warning' %}
+                    alert-warning
+                {% elif message.tags == 'info' %}
+                    alert-info
+                {% else %}
+                    alert-secondary
+                {% endif %}
+                alert-dismissible fade show"
+                role="alert"
+            >
+                <div class="d-flex align-items-center gap-2">
+                    {% if message.tags == "success" %}
+                        <i class="fa-solid fa-circle-check"></i>
+                    {% elif message.tags == "error" %}
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                    {% elif message.tags == "warning" %}
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    {% else %}
+                        <i class="fa-solid fa-circle-info"></i>
+                    {% endif %}
+
+                    <span>{{ message }}</span>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"
+                ></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

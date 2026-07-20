@@ -1,0 +1,285 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ palette.name }} | Skilite Build
+{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{% static 'css/palette-detail.css' %}"
+>
+{% endblock %}
+
+{% block content %}
+<section class="palette-detail-page py-5">
+    <div class="container">
+
+        <div class="detail-toolbar mb-4">
+            <a
+                href="{% url 'palettes:my_palettes' %}"
+                class="btn btn-outline-secondary"
+            >
+                <i class="fa-solid fa-arrow-left me-2"></i>
+                My Palettes
+            </a>
+
+            <div class="detail-actions">
+                <a
+                    href="{% url 'palettes:edit' palette.slug %}"
+                    class="btn btn-primary"
+                >
+                    <i class="fa-solid fa-pen me-2"></i>
+                    Edit
+                </a>
+
+                <form
+                    method="post"
+                    action="{% url 'palettes:duplicate' palette.slug %}"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-outline-primary"
+                    >
+                        <i class="fa-regular fa-copy me-2"></i>
+                        Duplicate
+                    </button>
+                </form>
+
+                <a
+                    href="{% url 'palettes:delete' palette.slug %}"
+                    class="btn btn-outline-danger"
+                >
+                    <i class="fa-solid fa-trash me-2"></i>
+                    Delete
+                </a>
+            </div>
+        </div>
+
+        <div class="detail-heading mb-4">
+            <div>
+                <div class="detail-badges mb-2">
+                    <span>
+                        {{ palette.get_source_type_display }}
+                    </span>
+
+                    <span>
+                        {{ palette.get_theme_mode_display }}
+                    </span>
+
+                    {% if palette.business_category %}
+                        <span>
+                            {{ palette.business_category.name }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <h1 class="display-6 fw-bold">
+                    {{ palette.name }}
+                </h1>
+
+                <p class="text-secondary">
+                    {% if palette.description %}
+                        {{ palette.description }}
+                    {% else %}
+                        No description has been added.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="detail-layout">
+
+            <div class="palette-preview-panel">
+                <div
+                    class="detail-preview"
+                    style="
+                        --primary: {{ preview_colors.PRIMARY }};
+                        --secondary: {{ preview_colors.SECONDARY }};
+                        --accent: {{ preview_colors.ACCENT }};
+                        --background: {{ preview_colors.BACKGROUND }};
+                        --surface: {{ preview_colors.SURFACE }};
+                        --heading: {{ preview_colors.HEADING }};
+                        --body: {{ preview_colors.BODY_TEXT }};
+                        --muted: {{ preview_colors.MUTED_TEXT }};
+                        --border: {{ preview_colors.BORDER }};
+                        --success: {{ preview_colors.SUCCESS }};
+                        --warning: {{ preview_colors.WARNING }};
+                        --danger: {{ preview_colors.DANGER }};
+                        --info: {{ preview_colors.INFO }};
+                    "
+                >
+                    <nav>
+                        <strong>Your Business</strong>
+
+                        <div>
+                            <span>Home</span>
+                            <span>Services</span>
+                            <span>Contact</span>
+                        </div>
+                    </nav>
+
+                    <section class="detail-preview-hero">
+                        <span class="preview-kicker">
+                            Professional business solution
+                        </span>
+
+                        <h2>
+                            Build a stronger digital presence
+                        </h2>
+
+                        <p>
+                            Previewing your saved semantic colour
+                            system on a realistic website layout.
+                        </p>
+
+                        <button type="button">
+                            Get started
+                        </button>
+                    </section>
+
+                    <section class="detail-preview-cards">
+                        <article>
+                            <h3>Professional</h3>
+                            <p>
+                                A complete website-ready colour system.
+                            </p>
+                        </article>
+
+                        <article>
+                            <h3>Editable</h3>
+                            <p>
+                                Continue refining every semantic role.
+                            </p>
+                        </article>
+
+                        <article>
+                            <h3>Exportable</h3>
+                            <p>
+                                Prepare the palette for development.
+                            </p>
+                        </article>
+                    </section>
+
+                    <section class="detail-statuses">
+                        <span class="status-success">Success</span>
+                        <span class="status-warning">Warning</span>
+                        <span class="status-danger">Danger</span>
+                        <span class="status-info">Information</span>
+                    </section>
+                </div>
+            </div>
+
+            <aside class="palette-information-panel">
+                <h2 class="h5 mb-3">
+                    Palette information
+                </h2>
+
+                <dl>
+                    <div>
+                        <dt>Source</dt>
+                        <dd>
+                            {{ palette.get_source_type_display }}
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Theme</dt>
+                        <dd>
+                            {{ palette.get_theme_mode_display }}
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Category</dt>
+                        <dd>
+                            {% if palette.business_category %}
+                                {{ palette.business_category.name }}
+                            {% else %}
+                                General
+                            {% endif %}
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Dominant family</dt>
+                        <dd>
+                            {% if palette.dominant_color_family %}
+                                {{ palette.dominant_color_family.name }}
+                            {% else %}
+                                Not specified
+                            {% endif %}
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Created</dt>
+                        <dd>
+                            {{ palette.created_at|date:"M d, Y" }}
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Updated</dt>
+                        <dd>
+                            {{ palette.updated_at|date:"M d, Y" }}
+                        </dd>
+                    </div>
+
+                    {% if palette.source_palette %}
+                        <div>
+                            <dt>Original palette</dt>
+                            <dd>
+                                {{ palette.source_palette.name }}
+                            </dd>
+                        </div>
+                    {% endif %}
+                </dl>
+            </aside>
+
+        </div>
+
+        <div class="colour-role-section mt-4">
+            <div class="section-heading">
+                <div>
+                    <h2 class="h4 mb-1">
+                        Semantic colour roles
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Complete website colour system containing
+                        13 semantic roles.
+                    </p>
+                </div>
+
+                <span class="badge text-bg-primary">
+                    {{ ordered_colors|length }} colours
+                </span>
+            </div>
+
+            <div class="detail-swatch-grid mt-4">
+                {% for color in ordered_colors %}
+                    <article class="detail-swatch">
+                        <div
+                            class="detail-swatch-colour"
+                            style="background-color: {{ color.hex_value }};"
+                        ></div>
+
+                        <div class="detail-swatch-content">
+                            <strong>
+                                {{ color.get_role_display }}
+                            </strong>
+
+                            <code>{{ color.hex_value }}</code>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

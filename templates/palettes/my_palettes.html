@@ -1,0 +1,507 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}
+    My Palettes | Skilite Build
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/my-palettes.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+<section class="my-palettes-page py-5">
+    <div class="container">
+
+        <div class="page-heading">
+            <div>
+                <span class="page-badge">
+                    Palette library
+                </span>
+
+                <h1 class="display-6 fw-bold mt-2 mb-2">
+                    My Palettes
+                </h1>
+
+                <p class="text-secondary mb-0">
+                    Manage your manual palettes, recommendations,
+                    duplicates, and copied community palettes.
+                </p>
+            </div>
+
+            <div class="heading-actions">
+                <a
+                    href="{% url 'recommendations:index' %}"
+                    class="btn btn-outline-primary"
+                >
+                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i>
+                    Get recommendation
+                </a>
+
+                <a
+                    href="{% url 'palettes:editor' %}"
+                    class="btn btn-primary"
+                >
+                    <i class="fa-solid fa-plus me-2"></i>
+                    Create palette
+                </a>
+            </div>
+        </div>
+
+        <div class="palette-statistics my-4">
+            <article class="statistic-card">
+                <span class="statistic-icon">
+                    <i class="fa-solid fa-palette"></i>
+                </span>
+
+                <div>
+                    <strong>{{ total_palette_count }}</strong>
+                    <span>Total palettes</span>
+                </div>
+            </article>
+
+            <article class="statistic-card">
+                <span class="statistic-icon">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </span>
+
+                <div>
+                    <strong>{{ manual_palette_count }}</strong>
+                    <span>Manual palettes</span>
+                </div>
+            </article>
+
+            <article class="statistic-card">
+                <span class="statistic-icon">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </span>
+
+                <div>
+                    <strong>
+                        {{ recommendation_palette_count }}
+                    </strong>
+                    <span>Recommendations</span>
+                </div>
+            </article>
+
+            <article class="statistic-card">
+                <span class="statistic-icon">
+                    <i class="fa-regular fa-copy"></i>
+                </span>
+
+                <div>
+                    <strong>{{ copied_palette_count }}</strong>
+                    <span>Copied palettes</span>
+                </div>
+            </article>
+        </div>
+
+        <form
+            method="get"
+            class="palette-filter-panel mb-4"
+        >
+            <div class="row g-3 align-items-end">
+
+                <div class="col-lg-5">
+                    <label
+                        for="palette-search"
+                        class="form-label fw-semibold"
+                    >
+                        Search palettes
+                    </label>
+
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+
+                        <input
+                            type="search"
+                            name="search"
+                            id="palette-search"
+                            class="form-control"
+                            value="{{ current_search }}"
+                            placeholder="Search name, category, or description"
+                        >
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3">
+                    <label
+                        for="source-filter"
+                        class="form-label fw-semibold"
+                    >
+                        Source
+                    </label>
+
+                    <select
+                        name="source"
+                        id="source-filter"
+                        class="form-select"
+                    >
+                        <option value="">
+                            All sources
+                        </option>
+
+                        {% for value, label in source_choices %}
+                            {% if value != "PRESET" and value != "RECOMMENDATION_TEMPLATE" %}
+                                <option
+                                    value="{{ value }}"
+                                    {% if current_source == value %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ label }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4 col-lg-2">
+                    <label
+                        for="theme-filter"
+                        class="form-label fw-semibold"
+                    >
+                        Theme
+                    </label>
+
+                    <select
+                        name="theme"
+                        id="theme-filter"
+                        class="form-select"
+                    >
+                        <option value="">
+                            All themes
+                        </option>
+
+                        {% for value, label in theme_choices %}
+                            <option
+                                value="{{ value }}"
+                                {% if current_theme == value %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4 col-lg-2">
+                    <button
+                        type="submit"
+                        class="btn btn-dark w-100"
+                    >
+                        Apply filters
+                    </button>
+                </div>
+
+            </div>
+
+            {% if current_search or current_source or current_theme %}
+                <div class="mt-3">
+                    <a
+                        href="{% url 'palettes:my_palettes' %}"
+                        class="small text-decoration-none"
+                    >
+                        <i class="fa-solid fa-xmark me-1"></i>
+                        Clear all filters
+                    </a>
+                </div>
+            {% endif %}
+        </form>
+
+        {% if palettes %}
+            <div class="palette-card-grid">
+                {% for palette in palettes %}
+                    <article class="palette-card">
+
+                        <div class="palette-colour-strip">
+                            {% for color in palette.card_colors %}
+                                <span
+                                    style="background-color: {{ color.hex_value }};"
+                                    title="{{ color.get_role_display }}: {{ color.hex_value }}"
+                                ></span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="palette-card-body">
+                            <div class="palette-card-header">
+                                <div>
+                                    <div class="palette-card-badges">
+                                        <span class="source-badge">
+                                            {{ palette.get_source_type_display }}
+                                        </span>
+
+                                        <span class="theme-badge">
+                                            {% if palette.theme_mode == "DARK" %}
+                                                <i class="fa-solid fa-moon me-1"></i>
+                                            {% else %}
+                                                <i class="fa-solid fa-sun me-1"></i>
+                                            {% endif %}
+
+                                            {{ palette.get_theme_mode_display }}
+                                        </span>
+                                    </div>
+
+                                    <h2 class="h5 mt-3 mb-1">
+                                        {{ palette.name }}
+                                    </h2>
+
+                                    <p class="palette-category mb-0">
+                                        {% if palette.business_category %}
+                                            <i
+                                                class="{{ palette.business_category.icon }} me-1"
+                                            ></i>
+
+                                            {{ palette.business_category.name }}
+                                        {% else %}
+                                            General business
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                                <div class="dropdown">
+                                    <button
+                                        class="palette-menu-button"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                        aria-label="Palette actions"
+                                    >
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a
+                                                class="dropdown-item"
+                                                href="{% url 'palettes:detail' palette.slug %}"
+                                            >
+                                                <i class="fa-regular fa-eye me-2"></i>
+                                                View palette
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a
+                                                class="dropdown-item"
+                                                href="{% url 'palettes:edit' palette.slug %}"
+                                            >
+                                                <i class="fa-solid fa-pen me-2"></i>
+                                                Edit palette
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <form
+                                                method="post"
+                                                action="{% url 'palettes:duplicate' palette.slug %}"
+                                            >
+                                                {% csrf_token %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="dropdown-item"
+                                                >
+                                                    <i class="fa-regular fa-copy me-2"></i>
+                                                    Duplicate
+                                                </button>
+                                            </form>
+                                        </li>
+
+                                        <li>
+                                            <button
+                                                type="button"
+                                                class="dropdown-item disabled"
+                                                disabled
+                                            >
+                                                <i class="fa-solid fa-code me-2"></i>
+                                                Export
+                                            </button>
+                                        </li>
+
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+
+                                        <li>
+                                            <a
+                                                class="dropdown-item text-danger"
+                                                href="{% url 'palettes:delete' palette.slug %}"
+                                            >
+                                                <i class="fa-solid fa-trash me-2"></i>
+                                                Delete palette
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            {% if palette.description %}
+                                <p class="palette-description">
+                                    {{ palette.description|truncatechars:110 }}
+                                </p>
+                            {% else %}
+                                <p class="palette-description text-secondary">
+                                    No description has been added.
+                                </p>
+                            {% endif %}
+
+                            <div class="palette-metadata">
+                                <span>
+                                    <i class="fa-solid fa-droplet me-1"></i>
+                                    {{ palette.color_total }} colours
+                                </span>
+
+                                <span>
+                                    <i class="fa-regular fa-heart me-1"></i>
+                                    {{ palette.like_total }}
+                                </span>
+
+                                <span>
+                                    <i class="fa-regular fa-eye me-1"></i>
+                                    {{ palette.view_total }}
+                                </span>
+                            </div>
+
+                            <div class="palette-card-footer">
+                                <small>
+                                    Updated
+                                    {{ palette.updated_at|timesince }}
+                                    ago
+                                </small>
+
+                                <a
+                                    href="{% url 'palettes:detail' palette.slug %}"
+                                    class="btn btn-sm btn-outline-primary"
+                                >
+                                    View palette
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            {% if is_paginated %}
+                <nav
+                    class="mt-5"
+                    aria-label="Palette pagination"
+                >
+                    <ul class="pagination justify-content-center">
+
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a
+                                    class="page-link"
+                                    href="?search={{ current_search|urlencode }}&source={{ current_source|urlencode }}&theme={{ current_theme|urlencode }}&page={{ page_obj.previous_page_number }}"
+                                >
+                                    Previous
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Previous
+                                </span>
+                            </li>
+                        {% endif %}
+
+                        {% for page_number in paginator.page_range %}
+                            {% if page_number == page_obj.number %}
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        {{ page_number }}
+                                    </span>
+                                </li>
+                            {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                                <li class="page-item">
+                                    <a
+                                        class="page-link"
+                                        href="?search={{ current_search|urlencode }}&source={{ current_source|urlencode }}&theme={{ current_theme|urlencode }}&page={{ page_number }}"
+                                    >
+                                        {{ page_number }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a
+                                    class="page-link"
+                                    href="?search={{ current_search|urlencode }}&source={{ current_source|urlencode }}&theme={{ current_theme|urlencode }}&page={{ page_obj.next_page_number }}"
+                                >
+                                    Next
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Next
+                                </span>
+                            </li>
+                        {% endif %}
+
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="empty-palette-state">
+                <div class="empty-state-icon">
+                    <i class="fa-solid fa-palette"></i>
+                </div>
+
+                {% if current_search or current_source or current_theme %}
+                    <h2 class="h3">
+                        No matching palettes found
+                    </h2>
+
+                    <p>
+                        Try changing or clearing the current filters.
+                    </p>
+
+                    <a
+                        href="{% url 'palettes:my_palettes' %}"
+                        class="btn btn-outline-primary"
+                    >
+                        Clear filters
+                    </a>
+                {% else %}
+                    <h2 class="h3">
+                        Create your first palette
+                    </h2>
+
+                    <p>
+                        Start manually or generate a professional
+                        recommendation for your business category.
+                    </p>
+
+                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                        <a
+                            href="{% url 'palettes:editor' %}"
+                            class="btn btn-primary"
+                        >
+                            Create palette
+                        </a>
+
+                        <a
+                            href="{% url 'recommendations:index' %}"
+                            class="btn btn-outline-primary"
+                        >
+                            Get recommendation
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

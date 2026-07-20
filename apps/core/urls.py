@@ -1,6 +1,8 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
+from .views import HomeView
+
 
 app_name = "core"
 
@@ -8,9 +10,7 @@ app_name = "core"
 urlpatterns = [
     path(
         "",
-        TemplateView.as_view(
-            template_name="core/home.html",
-        ),
+        HomeView.as_view(),
         name="home",
     ),
 
@@ -21,7 +21,8 @@ urlpatterns = [
             extra_context={
                 "page_title": "About Skilite Build",
                 "page_message": (
-                    "Learn more about the Skilite Build platform."
+                    "Learn more about the Skilite Build "
+                    "website colour-system platform."
                 ),
             },
         ),
@@ -33,9 +34,10 @@ urlpatterns = [
         TemplateView.as_view(
             template_name="base/coming_soon.html",
             extra_context={
-                "page_title": "Contact Us",
+                "page_title": "Contact",
                 "page_message": (
-                    "The contact page will be implemented soon."
+                    "The Skilite Build contact page "
+                    "is being prepared."
                 ),
             },
         ),

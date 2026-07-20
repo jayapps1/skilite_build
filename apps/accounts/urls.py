@@ -1,5 +1,6 @@
 from django.urls import path
 from django.views.generic import TemplateView
+from django.contrib.auth.views import LogoutView
 
 
 app_name = "accounts"
@@ -77,4 +78,12 @@ urlpatterns = [
         ),
         name="settings",
     ),
+
+    path(
+    "logout/",
+    LogoutView.as_view(
+        next_page="core:home",
+    ),
+    name="logout",
+),
 ]

@@ -1,0 +1,416 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Preset Palettes | Skilite Build{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{% static 'css/presets.css' %}"
+>
+{% endblock %}
+
+{% block content %}
+<section class="preset-page py-5">
+    <div class="container">
+        <header class="preset-hero mb-4">
+            <div>
+                <span class="preset-eyebrow">
+                    Professional colour systems
+                </span>
+
+                <h1 class="preset-title">
+                    Preset Palettes
+                </h1>
+
+                <p class="preset-subtitle mb-0">
+                    Explore complete website colour systems designed
+                    for different industries. Apply a preset, then
+                    customise all 13 semantic colour roles in the editor.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'palettes:editor' %}"
+                class="btn btn-outline-primary"
+            >
+                <i class="fa-solid fa-palette me-2"></i>
+                Create Manually
+            </a>
+        </header>
+
+        <section
+            class="preset-filter-panel mb-4"
+            aria-labelledby="preset-filter-heading"
+        >
+            <div class="preset-filter-heading">
+                <div>
+                    <h2
+                        id="preset-filter-heading"
+                        class="h5 mb-1"
+                    >
+                        Filter presets
+                    </h2>
+
+                    <p class="text-muted mb-0">
+                        Narrow the gallery by business category or theme.
+                    </p>
+                </div>
+            </div>
+
+            <form
+                method="get"
+                class="preset-filter-form"
+            >
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-5">
+                        <label
+                            for="preset-category"
+                            class="form-label"
+                        >
+                            Business category
+                        </label>
+
+                        <select
+                            id="preset-category"
+                            name="category"
+                            class="form-select"
+                        >
+                            <option value="">
+                                All categories
+                            </option>
+
+                            {% for category in categories %}
+                                <option
+                                    value="{{ category.slug }}"
+                                    {% if selected_category == category.slug %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label
+                            for="preset-theme"
+                            class="form-label"
+                        >
+                            Theme
+                        </label>
+
+                        <select
+                            id="preset-theme"
+                            name="theme"
+                            class="form-select"
+                        >
+                            <option value="">
+                                All themes
+                            </option>
+
+                            {% for value, label in theme_choices %}
+                                <option
+                                    value="{{ value }}"
+                                    {% if selected_theme == value %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <div class="d-grid gap-2 d-sm-flex">
+                            <button
+                                type="submit"
+                                class="btn btn-primary flex-grow-1"
+                            >
+                                <i class="fa-solid fa-filter me-2"></i>
+                                Filter
+                            </button>
+
+                            {% if selected_category or selected_theme %}
+                                <a
+                                    href="{% url 'palettes:presets' %}"
+                                    class="btn btn-outline-secondary"
+                                    aria-label="Clear filters"
+                                >
+                                    <i class="fa-solid fa-xmark"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        {% if presets %}
+            <div class="preset-results-header mb-3">
+                <p class="mb-0 text-muted">
+                    Showing
+                    <strong>{{ page_obj.paginator.count }}</strong>
+                    preset{{ page_obj.paginator.count|pluralize }}.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                {% for preset in presets %}
+                    <div class="col-12 col-lg-6">
+                        <article class="preset-card h-100">
+                            <div class="preset-card-header">
+                                <div>
+                                    <div class="preset-badges mb-2">
+                                        {% if preset.business_category %}
+                                            <span class="badge text-bg-light">
+                                                <i class="fa-solid fa-briefcase me-1"></i>
+                                                {{ preset.business_category.name }}
+                                            </span>
+                                        {% endif %}
+
+                                        <span class="badge text-bg-light">
+                                            <i class="fa-solid fa-circle-half-stroke me-1"></i>
+                                            {{ preset.get_theme_mode_display }}
+                                        </span>
+                                    </div>
+
+                                    <h2 class="preset-card-title h4">
+                                        {{ preset.name }}
+                                    </h2>
+
+                                    {% if preset.description %}
+                                        <p class="preset-description mb-0">
+                                            {{ preset.description }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+
+                                <div class="preset-family">
+                                    <span class="preset-family-label">
+                                        Dominant family
+                                    </span>
+
+                                    <strong>
+                                        {% if preset.dominant_color_family %}
+                                            {{ preset.dominant_color_family.name }}
+                                        {% else %}
+                                            Not specified
+                                        {% endif %}
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div
+                                class="preset-colour-strip"
+                                aria-label="{{ preset.name }} colour strip"
+                            >
+                                {% for color in preset.preset_colors %}
+                                    <span
+                                        class="preset-strip-colour"
+                                        style="background-color: {{ color.hex_value }};"
+                                        title="{{ color.get_role_display }}: {{ color.hex_value }}"
+                                    ></span>
+                                {% endfor %}
+                            </div>
+
+                            <div class="preset-preview">
+                                <div class="preset-preview-window">
+                                    <div class="preset-preview-browser">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+
+                                    <div class="preset-preview-content">
+                                        <span class="preset-preview-kicker">
+                                            {{ preset.business_category.name|default:"Professional Business" }}
+                                        </span>
+
+                                        <h3>
+                                            {{ preset.name }}
+                                        </h3>
+
+                                        <p>
+                                            A ready-made semantic system for
+                                            headings, text, surfaces, borders,
+                                            actions, and feedback states.
+                                        </p>
+
+                                        <div class="preset-preview-actions">
+                                            <span>Primary action</span>
+                                            <span>Secondary action</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="preset-role-section">
+                                <div class="preset-role-heading">
+                                    <h3 class="h6 mb-0">
+                                        All 13 semantic roles
+                                    </h3>
+
+                                    <span>
+                                        {{ preset.preset_colors|length }}/13
+                                    </span>
+                                </div>
+
+                                <div class="preset-role-grid">
+                                    {% for color in preset.preset_colors %}
+                                        <div class="preset-role-item">
+                                            <span
+                                                class="preset-role-swatch"
+                                                style="background-color: {{ color.hex_value }};"
+                                                aria-hidden="true"
+                                            ></span>
+
+                                            <div class="preset-role-text">
+                                                <span class="preset-role-name">
+                                                    {{ color.get_role_display }}
+                                                </span>
+
+                                                <code>
+                                                    {{ color.hex_value }}
+                                                </code>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-danger mb-0">
+                                            This preset has no colour records.
+                                        </p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <footer class="preset-card-footer">
+                                <div class="preset-footer-note">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    The original system preset remains protected.
+                                </div>
+
+                                {% if request.user.is_authenticated %}
+                                    <form
+                                        method="post"
+                                        action="{% url 'palettes:apply_preset' preset.slug %}"
+                                    >
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-primary"
+                                            {% if preset.preset_colors|length != 13 %}
+                                                disabled
+                                            {% endif %}
+                                        >
+                                            <i class="fa-solid fa-copy me-2"></i>
+                                            Apply Preset
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <a
+                                        href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}"
+                                        class="btn btn-primary"
+                                    >
+                                        <i class="fa-solid fa-right-to-bracket me-2"></i>
+                                        Sign in to Apply
+                                    </a>
+                                {% endif %}
+                            </footer>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if is_paginated %}
+                <nav
+                    class="preset-pagination mt-5"
+                    aria-label="Preset palette pages"
+                >
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a
+                                    class="page-link"
+                                    href="?{% if filter_query %}{{ filter_query }}&{% endif %}page={{ page_obj.previous_page_number }}"
+                                >
+                                    Previous
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Previous
+                                </span>
+                            </li>
+                        {% endif %}
+
+                        {% for page_number in page_obj.paginator.page_range %}
+                            {% if page_number == page_obj.number %}
+                                <li
+                                    class="page-item active"
+                                    aria-current="page"
+                                >
+                                    <span class="page-link">
+                                        {{ page_number }}
+                                    </span>
+                                </li>
+                            {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                                <li class="page-item">
+                                    <a
+                                        class="page-link"
+                                        href="?{% if filter_query %}{{ filter_query }}&{% endif %}page={{ page_number }}"
+                                    >
+                                        {{ page_number }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a
+                                    class="page-link"
+                                    href="?{% if filter_query %}{{ filter_query }}&{% endif %}page={{ page_obj.next_page_number }}"
+                                >
+                                    Next
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Next
+                                </span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <section class="preset-empty-state">
+                <div class="preset-empty-icon">
+                    <i class="fa-solid fa-palette"></i>
+                </div>
+
+                <h2 class="h4">
+                    No presets match these filters
+                </h2>
+
+                <p class="text-muted">
+                    Clear the selected filters or choose another
+                    category and theme.
+                </p>
+
+                <a
+                    href="{% url 'palettes:presets' %}"
+                    class="btn btn-primary"
+                >
+                    View all presets
+                </a>
+            </section>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
