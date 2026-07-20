@@ -1,0 +1,1063 @@
+from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
+
+from apps.core.choices import (
+    ColorRole,
+    ModerationStatus,
+    PaletteSource,
+    PaletteVisibility,
+    ThemeMode,
+)
+from apps.core.models import BusinessCategory, ColorFamily
+from apps.palettes.models import Palette, PaletteColor
+
+
+LIGHT_FEEDBACK_COLORS = {
+    ColorRole.SUCCESS: "#15803D",
+    ColorRole.WARNING: "#B45309",
+    ColorRole.DANGER: "#B91C1C",
+    ColorRole.INFO: "#0369A1",
+}
+
+
+DARK_FEEDBACK_COLORS = {
+    ColorRole.SUCCESS: "#4ADE80",
+    ColorRole.WARNING: "#FBBF24",
+    ColorRole.DANGER: "#F87171",
+    ColorRole.INFO: "#38BDF8",
+}
+
+
+PALETTE_BLUEPRINTS = [
+    {
+        "category_slug": "technology",
+        "dominant_family_slug": "blue",
+        "light": {
+            ColorRole.PRIMARY: "#2563EB",
+            ColorRole.SECONDARY: "#475569",
+            ColorRole.ACCENT: "#7C3AED",
+            ColorRole.BACKGROUND: "#F8FAFC",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#0F172A",
+            ColorRole.BODY_TEXT: "#334155",
+            ColorRole.MUTED_TEXT: "#64748B",
+            ColorRole.BORDER: "#CBD5E1",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#60A5FA",
+            ColorRole.SECONDARY: "#94A3B8",
+            ColorRole.ACCENT: "#A78BFA",
+            ColorRole.BACKGROUND: "#020617",
+            ColorRole.SURFACE: "#0F172A",
+            ColorRole.HEADING: "#F8FAFC",
+            ColorRole.BODY_TEXT: "#CBD5E1",
+            ColorRole.MUTED_TEXT: "#94A3B8",
+            ColorRole.BORDER: "#334155",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "finance",
+        "dominant_family_slug": "blue",
+        "light": {
+            ColorRole.PRIMARY: "#0F4C81",
+            ColorRole.SECONDARY: "#334155",
+            ColorRole.ACCENT: "#C49A3A",
+            ColorRole.BACKGROUND: "#F6F8FB",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#0B1F33",
+            ColorRole.BODY_TEXT: "#334155",
+            ColorRole.MUTED_TEXT: "#64748B",
+            ColorRole.BORDER: "#CBD5E1",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#5DADE2",
+            ColorRole.SECONDARY: "#A8B3C2",
+            ColorRole.ACCENT: "#F2C66D",
+            ColorRole.BACKGROUND: "#07111F",
+            ColorRole.SURFACE: "#0E1B2B",
+            ColorRole.HEADING: "#F8FAFC",
+            ColorRole.BODY_TEXT: "#D6DEE8",
+            ColorRole.MUTED_TEXT: "#9AA8BA",
+            ColorRole.BORDER: "#2A3C52",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "restaurant-food",
+        "dominant_family_slug": "red",
+        "light": {
+            ColorRole.PRIMARY: "#B91C1C",
+            ColorRole.SECONDARY: "#78350F",
+            ColorRole.ACCENT: "#F59E0B",
+            ColorRole.BACKGROUND: "#FFF7ED",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#431407",
+            ColorRole.BODY_TEXT: "#7C2D12",
+            ColorRole.MUTED_TEXT: "#9A3412",
+            ColorRole.BORDER: "#FED7AA",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#F87171",
+            ColorRole.SECONDARY: "#FDBA74",
+            ColorRole.ACCENT: "#FBBF24",
+            ColorRole.BACKGROUND: "#1C0A05",
+            ColorRole.SURFACE: "#2A120B",
+            ColorRole.HEADING: "#FFF7ED",
+            ColorRole.BODY_TEXT: "#FED7AA",
+            ColorRole.MUTED_TEXT: "#FDBA74",
+            ColorRole.BORDER: "#7C2D12",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "healthcare",
+        "dominant_family_slug": "teal",
+        "light": {
+            ColorRole.PRIMARY: "#0F766E",
+            ColorRole.SECONDARY: "#0E7490",
+            ColorRole.ACCENT: "#22C55E",
+            ColorRole.BACKGROUND: "#F0FDFA",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#134E4A",
+            ColorRole.BODY_TEXT: "#334155",
+            ColorRole.MUTED_TEXT: "#64748B",
+            ColorRole.BORDER: "#99F6E4",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#2DD4BF",
+            ColorRole.SECONDARY: "#22D3EE",
+            ColorRole.ACCENT: "#4ADE80",
+            ColorRole.BACKGROUND: "#042F2E",
+            ColorRole.SURFACE: "#0F3D3A",
+            ColorRole.HEADING: "#ECFEFF",
+            ColorRole.BODY_TEXT: "#CCFBF1",
+            ColorRole.MUTED_TEXT: "#99F6E4",
+            ColorRole.BORDER: "#115E59",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "education",
+        "dominant_family_slug": "blue",
+        "light": {
+            ColorRole.PRIMARY: "#1D4ED8",
+            ColorRole.SECONDARY: "#4338CA",
+            ColorRole.ACCENT: "#F59E0B",
+            ColorRole.BACKGROUND: "#EFF6FF",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#172554",
+            ColorRole.BODY_TEXT: "#334155",
+            ColorRole.MUTED_TEXT: "#64748B",
+            ColorRole.BORDER: "#BFDBFE",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#60A5FA",
+            ColorRole.SECONDARY: "#818CF8",
+            ColorRole.ACCENT: "#FBBF24",
+            ColorRole.BACKGROUND: "#111827",
+            ColorRole.SURFACE: "#1F2937",
+            ColorRole.HEADING: "#F9FAFB",
+            ColorRole.BODY_TEXT: "#D1D5DB",
+            ColorRole.MUTED_TEXT: "#9CA3AF",
+            ColorRole.BORDER: "#374151",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "beauty-cosmetics",
+        "dominant_family_slug": "pink",
+        "light": {
+            ColorRole.PRIMARY: "#BE185D",
+            ColorRole.SECONDARY: "#7E22CE",
+            ColorRole.ACCENT: "#F472B6",
+            ColorRole.BACKGROUND: "#FDF2F8",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#500724",
+            ColorRole.BODY_TEXT: "#4A2040",
+            ColorRole.MUTED_TEXT: "#9D174D",
+            ColorRole.BORDER: "#FBCFE8",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#F472B6",
+            ColorRole.SECONDARY: "#C084FC",
+            ColorRole.ACCENT: "#F9A8D4",
+            ColorRole.BACKGROUND: "#1F0A17",
+            ColorRole.SURFACE: "#321125",
+            ColorRole.HEADING: "#FDF2F8",
+            ColorRole.BODY_TEXT: "#FBCFE8",
+            ColorRole.MUTED_TEXT: "#F9A8D4",
+            ColorRole.BORDER: "#831843",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "construction",
+        "dominant_family_slug": "orange",
+        "light": {
+            ColorRole.PRIMARY: "#C2410C",
+            ColorRole.SECONDARY: "#374151",
+            ColorRole.ACCENT: "#F59E0B",
+            ColorRole.BACKGROUND: "#FFF7ED",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#1F2937",
+            ColorRole.BODY_TEXT: "#374151",
+            ColorRole.MUTED_TEXT: "#6B7280",
+            ColorRole.BORDER: "#D1D5DB",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#FB923C",
+            ColorRole.SECONDARY: "#9CA3AF",
+            ColorRole.ACCENT: "#FBBF24",
+            ColorRole.BACKGROUND: "#111827",
+            ColorRole.SURFACE: "#1F2937",
+            ColorRole.HEADING: "#F9FAFB",
+            ColorRole.BODY_TEXT: "#D1D5DB",
+            ColorRole.MUTED_TEXT: "#9CA3AF",
+            ColorRole.BORDER: "#4B5563",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "logistics-transport",
+        "dominant_family_slug": "blue",
+        "light": {
+            ColorRole.PRIMARY: "#0369A1",
+            ColorRole.SECONDARY: "#334155",
+            ColorRole.ACCENT: "#F97316",
+            ColorRole.BACKGROUND: "#F0F9FF",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#0C4A6E",
+            ColorRole.BODY_TEXT: "#334155",
+            ColorRole.MUTED_TEXT: "#64748B",
+            ColorRole.BORDER: "#BAE6FD",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#38BDF8",
+            ColorRole.SECONDARY: "#94A3B8",
+            ColorRole.ACCENT: "#FB923C",
+            ColorRole.BACKGROUND: "#082F49",
+            ColorRole.SURFACE: "#0C4A6E",
+            ColorRole.HEADING: "#F0F9FF",
+            ColorRole.BODY_TEXT: "#D6EAF8",
+            ColorRole.MUTED_TEXT: "#7DD3FC",
+            ColorRole.BORDER: "#075985",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+]
+
+
+class Command(BaseCommand):
+    help = (
+        "Seeds public preset palettes and light/dark "
+        "recommendation-template palettes."
+    )
+
+    requires_migrations_checks = True
+
+    @transaction.atomic
+    def handle(self, *args, **options):
+        self.stdout.write(
+            self.style.MIGRATE_HEADING(
+                "Seeding preset and recommendation-template palettes..."
+            )
+        )
+
+        palette_counts = {
+            "created": 0,
+            "updated": 0,
+        }
+
+        color_counts = {
+            "created": 0,
+            "updated": 0,
+        }
+
+        for blueprint in PALETTE_BLUEPRINTS:
+            category = self.get_category(
+                blueprint["category_slug"]
+            )
+
+            dominant_family = self.get_color_family(
+                blueprint["dominant_family_slug"]
+            )
+
+            variants = [
+                {
+                    "slug": (
+                        f"system-preset-"
+                        f"{blueprint['category_slug']}-light"
+                    ),
+                    "name": (
+                        f"{category.name} Professional Light"
+                    ),
+                    "description": (
+                        f"A professional light preset palette for "
+                        f"{category.name.lower()} websites."
+                    ),
+                    "source_type": PaletteSource.PRESET,
+                    "theme_mode": ThemeMode.LIGHT,
+                    "visibility": PaletteVisibility.PUBLIC,
+                    "allow_export": True,
+                    "is_published": True,
+                    "colors": blueprint["light"],
+                },
+                {
+                    "slug": (
+                        f"system-template-"
+                        f"{blueprint['category_slug']}-light"
+                    ),
+                    "name": (
+                        f"{category.name} Recommendation Template Light"
+                    ),
+                    "description": (
+                        f"System light recommendation template for "
+                        f"{category.name.lower()} businesses."
+                    ),
+                    "source_type": (
+                        PaletteSource.RECOMMENDATION_TEMPLATE
+                    ),
+                    "theme_mode": ThemeMode.LIGHT,
+                    "visibility": PaletteVisibility.UNLISTED,
+                    "allow_export": False,
+                    "is_published": False,
+                    "colors": blueprint["light"],
+                },
+                {
+                    "slug": (
+                        f"system-template-"
+                        f"{blueprint['category_slug']}-dark"
+                    ),
+                    "name": (
+                        f"{category.name} Recommendation Template Dark"
+                    ),
+                    "description": (
+                        f"System dark recommendation template for "
+                        f"{category.name.lower()} businesses."
+                    ),
+                    "source_type": (
+                        PaletteSource.RECOMMENDATION_TEMPLATE
+                    ),
+                    "theme_mode": ThemeMode.DARK,
+                    "visibility": PaletteVisibility.UNLISTED,
+                    "allow_export": False,
+                    "is_published": False,
+                    "colors": blueprint["dark"],
+                },
+            ]
+
+            for variant in variants:
+                palette_created, current_color_counts = (
+                    self.upsert_palette(
+                        category=category,
+                        dominant_family=dominant_family,
+                        variant=variant,
+                    )
+                )
+
+                if palette_created:
+                    palette_counts["created"] += 1
+                else:
+                    palette_counts["updated"] += 1
+
+                color_counts["created"] += (
+                    current_color_counts["created"]
+                )
+
+                color_counts["updated"] += (
+                    current_color_counts["updated"]
+                )
+
+        self.stdout.write("")
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Preset and recommendation-template palettes "
+                "seeded successfully."
+            )
+        )
+
+        self.stdout.write(
+            f"Palettes: {palette_counts['created']} created, "
+            f"{palette_counts['updated']} updated."
+        )
+
+        self.stdout.write(
+            f"Palette colours: {color_counts['created']} created, "
+            f"{color_counts['updated']} updated."
+        )
+
+    def upsert_palette(
+        self,
+        category,
+        dominant_family,
+        variant,
+    ):
+        colors = variant["colors"]
+
+        self.validate_color_map(
+            palette_name=variant["name"],
+            colors=colors,
+        )
+
+        palette, palette_created = (
+            Palette.objects.update_or_create(
+                slug=variant["slug"],
+                defaults={
+                    "owner": None,
+                    "business_category": category,
+                    "dominant_color_family": dominant_family,
+                    "source_palette": None,
+                    "name": variant["name"],
+                    "description": variant["description"],
+                    "source_type": variant["source_type"],
+                    "theme_mode": variant["theme_mode"],
+                    "visibility": variant["visibility"],
+                    "moderation_status": (
+                        ModerationStatus.APPROVED
+                    ),
+                    "allow_export": variant["allow_export"],
+                    "is_published": variant["is_published"],
+                    "is_featured": False,
+                    "is_active": True,
+                },
+            )
+        )
+
+        color_counts = {
+            "created": 0,
+            "updated": 0,
+        }
+
+        expected_roles = set(ColorRole.values)
+
+        PaletteColor.objects.filter(
+            palette=palette,
+        ).exclude(
+            role__in=expected_roles,
+        ).delete()
+
+        for role in ColorRole.values:
+            _, color_created = (
+                PaletteColor.objects.update_or_create(
+                    palette=palette,
+                    role=role,
+                    defaults={
+                        "hex_value": colors[role],
+                    },
+                )
+            )
+
+            if color_created:
+                color_counts["created"] += 1
+            else:
+                color_counts["updated"] += 1
+
+        actual_roles = set(
+            PaletteColor.objects.filter(
+                palette=palette,
+            ).values_list(
+                "role",
+                flat=True,
+            )
+        )
+
+        if actual_roles != expected_roles:
+            missing_roles = sorted(
+                expected_roles - actual_roles
+            )
+
+            extra_roles = sorted(
+                actual_roles - expected_roles
+            )
+
+            raise CommandError(
+                f"Palette '{palette.name}' does not have the "
+                f"complete semantic colour system. "
+                f"Missing: {missing_roles}. Extra: {extra_roles}."
+            )
+
+        return palette_created, color_counts
+
+    def validate_color_map(self, palette_name, colors):
+        expected_roles = set(ColorRole.values)
+        supplied_roles = set(colors.keys())
+
+        missing_roles = sorted(
+            expected_roles - supplied_roles
+        )
+
+        extra_roles = sorted(
+            supplied_roles - expected_roles
+        )
+
+        if missing_roles or extra_roles:
+            raise CommandError(
+                f"Invalid colour map for '{palette_name}'. "
+                f"Missing roles: {missing_roles}. "
+                f"Unexpected roles: {extra_roles}."
+            )
+
+    def get_category(self, slug):
+        try:
+            return BusinessCategory.objects.get(
+                slug=slug,
+                is_active=True,
+            )
+        except BusinessCategory.DoesNotExist as exc:
+            raise CommandError(
+                f"Missing active business category '{slug}'. "
+                "Run: python manage.py seed_reference_data"
+            ) from exc
+
+    def get_color_family(self, slug):
+        try:
+            return ColorFamily.objects.get(
+                slug=slug,
+                is_active=True,
+            )
+        except ColorFamily.DoesNotExist as exc:
+            raise CommandError(
+                f"Missing active colour family '{slug}'. "
+                "Run: python manage.py seed_reference_data"
+            ) from exc
+PYcat > apps/palettes/management/commands/seed_palette_templates.py <<'PY'
+from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
+
+from apps.core.choices import (
+    ColorRole,
+    ModerationStatus,
+    PaletteSource,
+    PaletteVisibility,
+    ThemeMode,
+)
+from apps.core.models import BusinessCategory, ColorFamily
+from apps.palettes.models import Palette, PaletteColor
+
+
+LIGHT_FEEDBACK_COLORS = {
+    ColorRole.SUCCESS: "#15803D",
+    ColorRole.WARNING: "#B45309",
+    ColorRole.DANGER: "#B91C1C",
+    ColorRole.INFO: "#0369A1",
+}
+
+
+DARK_FEEDBACK_COLORS = {
+    ColorRole.SUCCESS: "#4ADE80",
+    ColorRole.WARNING: "#FBBF24",
+    ColorRole.DANGER: "#F87171",
+    ColorRole.INFO: "#38BDF8",
+}
+
+
+PALETTE_BLUEPRINTS = [
+    {
+        "category_slug": "technology",
+        "dominant_family_slug": "blue",
+        "light": {
+            ColorRole.PRIMARY: "#2563EB",
+            ColorRole.SECONDARY: "#475569",
+            ColorRole.ACCENT: "#7C3AED",
+            ColorRole.BACKGROUND: "#F8FAFC",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#0F172A",
+            ColorRole.BODY_TEXT: "#334155",
+            ColorRole.MUTED_TEXT: "#64748B",
+            ColorRole.BORDER: "#CBD5E1",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#60A5FA",
+            ColorRole.SECONDARY: "#94A3B8",
+            ColorRole.ACCENT: "#A78BFA",
+            ColorRole.BACKGROUND: "#020617",
+            ColorRole.SURFACE: "#0F172A",
+            ColorRole.HEADING: "#F8FAFC",
+            ColorRole.BODY_TEXT: "#CBD5E1",
+            ColorRole.MUTED_TEXT: "#94A3B8",
+            ColorRole.BORDER: "#334155",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "finance",
+        "dominant_family_slug": "blue",
+        "light": {
+            ColorRole.PRIMARY: "#0F4C81",
+            ColorRole.SECONDARY: "#334155",
+            ColorRole.ACCENT: "#C49A3A",
+            ColorRole.BACKGROUND: "#F6F8FB",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#0B1F33",
+            ColorRole.BODY_TEXT: "#334155",
+            ColorRole.MUTED_TEXT: "#64748B",
+            ColorRole.BORDER: "#CBD5E1",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#5DADE2",
+            ColorRole.SECONDARY: "#A8B3C2",
+            ColorRole.ACCENT: "#F2C66D",
+            ColorRole.BACKGROUND: "#07111F",
+            ColorRole.SURFACE: "#0E1B2B",
+            ColorRole.HEADING: "#F8FAFC",
+            ColorRole.BODY_TEXT: "#D6DEE8",
+            ColorRole.MUTED_TEXT: "#9AA8BA",
+            ColorRole.BORDER: "#2A3C52",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "restaurant-food",
+        "dominant_family_slug": "red",
+        "light": {
+            ColorRole.PRIMARY: "#B91C1C",
+            ColorRole.SECONDARY: "#78350F",
+            ColorRole.ACCENT: "#F59E0B",
+            ColorRole.BACKGROUND: "#FFF7ED",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#431407",
+            ColorRole.BODY_TEXT: "#7C2D12",
+            ColorRole.MUTED_TEXT: "#9A3412",
+            ColorRole.BORDER: "#FED7AA",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#F87171",
+            ColorRole.SECONDARY: "#FDBA74",
+            ColorRole.ACCENT: "#FBBF24",
+            ColorRole.BACKGROUND: "#1C0A05",
+            ColorRole.SURFACE: "#2A120B",
+            ColorRole.HEADING: "#FFF7ED",
+            ColorRole.BODY_TEXT: "#FED7AA",
+            ColorRole.MUTED_TEXT: "#FDBA74",
+            ColorRole.BORDER: "#7C2D12",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "healthcare",
+        "dominant_family_slug": "teal",
+        "light": {
+            ColorRole.PRIMARY: "#0F766E",
+            ColorRole.SECONDARY: "#0E7490",
+            ColorRole.ACCENT: "#22C55E",
+            ColorRole.BACKGROUND: "#F0FDFA",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#134E4A",
+            ColorRole.BODY_TEXT: "#334155",
+            ColorRole.MUTED_TEXT: "#64748B",
+            ColorRole.BORDER: "#99F6E4",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#2DD4BF",
+            ColorRole.SECONDARY: "#22D3EE",
+            ColorRole.ACCENT: "#4ADE80",
+            ColorRole.BACKGROUND: "#042F2E",
+            ColorRole.SURFACE: "#0F3D3A",
+            ColorRole.HEADING: "#ECFEFF",
+            ColorRole.BODY_TEXT: "#CCFBF1",
+            ColorRole.MUTED_TEXT: "#99F6E4",
+            ColorRole.BORDER: "#115E59",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "education",
+        "dominant_family_slug": "blue",
+        "light": {
+            ColorRole.PRIMARY: "#1D4ED8",
+            ColorRole.SECONDARY: "#4338CA",
+            ColorRole.ACCENT: "#F59E0B",
+            ColorRole.BACKGROUND: "#EFF6FF",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#172554",
+            ColorRole.BODY_TEXT: "#334155",
+            ColorRole.MUTED_TEXT: "#64748B",
+            ColorRole.BORDER: "#BFDBFE",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#60A5FA",
+            ColorRole.SECONDARY: "#818CF8",
+            ColorRole.ACCENT: "#FBBF24",
+            ColorRole.BACKGROUND: "#111827",
+            ColorRole.SURFACE: "#1F2937",
+            ColorRole.HEADING: "#F9FAFB",
+            ColorRole.BODY_TEXT: "#D1D5DB",
+            ColorRole.MUTED_TEXT: "#9CA3AF",
+            ColorRole.BORDER: "#374151",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "beauty-cosmetics",
+        "dominant_family_slug": "pink",
+        "light": {
+            ColorRole.PRIMARY: "#BE185D",
+            ColorRole.SECONDARY: "#7E22CE",
+            ColorRole.ACCENT: "#F472B6",
+            ColorRole.BACKGROUND: "#FDF2F8",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#500724",
+            ColorRole.BODY_TEXT: "#4A2040",
+            ColorRole.MUTED_TEXT: "#9D174D",
+            ColorRole.BORDER: "#FBCFE8",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#F472B6",
+            ColorRole.SECONDARY: "#C084FC",
+            ColorRole.ACCENT: "#F9A8D4",
+            ColorRole.BACKGROUND: "#1F0A17",
+            ColorRole.SURFACE: "#321125",
+            ColorRole.HEADING: "#FDF2F8",
+            ColorRole.BODY_TEXT: "#FBCFE8",
+            ColorRole.MUTED_TEXT: "#F9A8D4",
+            ColorRole.BORDER: "#831843",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "construction",
+        "dominant_family_slug": "orange",
+        "light": {
+            ColorRole.PRIMARY: "#C2410C",
+            ColorRole.SECONDARY: "#374151",
+            ColorRole.ACCENT: "#F59E0B",
+            ColorRole.BACKGROUND: "#FFF7ED",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#1F2937",
+            ColorRole.BODY_TEXT: "#374151",
+            ColorRole.MUTED_TEXT: "#6B7280",
+            ColorRole.BORDER: "#D1D5DB",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#FB923C",
+            ColorRole.SECONDARY: "#9CA3AF",
+            ColorRole.ACCENT: "#FBBF24",
+            ColorRole.BACKGROUND: "#111827",
+            ColorRole.SURFACE: "#1F2937",
+            ColorRole.HEADING: "#F9FAFB",
+            ColorRole.BODY_TEXT: "#D1D5DB",
+            ColorRole.MUTED_TEXT: "#9CA3AF",
+            ColorRole.BORDER: "#4B5563",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+    {
+        "category_slug": "logistics-transport",
+        "dominant_family_slug": "blue",
+        "light": {
+            ColorRole.PRIMARY: "#0369A1",
+            ColorRole.SECONDARY: "#334155",
+            ColorRole.ACCENT: "#F97316",
+            ColorRole.BACKGROUND: "#F0F9FF",
+            ColorRole.SURFACE: "#FFFFFF",
+            ColorRole.HEADING: "#0C4A6E",
+            ColorRole.BODY_TEXT: "#334155",
+            ColorRole.MUTED_TEXT: "#64748B",
+            ColorRole.BORDER: "#BAE6FD",
+            **LIGHT_FEEDBACK_COLORS,
+        },
+        "dark": {
+            ColorRole.PRIMARY: "#38BDF8",
+            ColorRole.SECONDARY: "#94A3B8",
+            ColorRole.ACCENT: "#FB923C",
+            ColorRole.BACKGROUND: "#082F49",
+            ColorRole.SURFACE: "#0C4A6E",
+            ColorRole.HEADING: "#F0F9FF",
+            ColorRole.BODY_TEXT: "#D6EAF8",
+            ColorRole.MUTED_TEXT: "#7DD3FC",
+            ColorRole.BORDER: "#075985",
+            **DARK_FEEDBACK_COLORS,
+        },
+    },
+]
+
+
+class Command(BaseCommand):
+    help = (
+        "Seeds public preset palettes and light/dark "
+        "recommendation-template palettes."
+    )
+
+    requires_migrations_checks = True
+
+    @transaction.atomic
+    def handle(self, *args, **options):
+        self.stdout.write(
+            self.style.MIGRATE_HEADING(
+                "Seeding preset and recommendation-template palettes..."
+            )
+        )
+
+        palette_counts = {
+            "created": 0,
+            "updated": 0,
+        }
+
+        color_counts = {
+            "created": 0,
+            "updated": 0,
+        }
+
+        for blueprint in PALETTE_BLUEPRINTS:
+            category = self.get_category(
+                blueprint["category_slug"]
+            )
+
+            dominant_family = self.get_color_family(
+                blueprint["dominant_family_slug"]
+            )
+
+            variants = [
+                {
+                    "slug": (
+                        f"system-preset-"
+                        f"{blueprint['category_slug']}-light"
+                    ),
+                    "name": (
+                        f"{category.name} Professional Light"
+                    ),
+                    "description": (
+                        f"A professional light preset palette for "
+                        f"{category.name.lower()} websites."
+                    ),
+                    "source_type": PaletteSource.PRESET,
+                    "theme_mode": ThemeMode.LIGHT,
+                    "visibility": PaletteVisibility.PUBLIC,
+                    "allow_export": True,
+                    "is_published": True,
+                    "colors": blueprint["light"],
+                },
+                {
+                    "slug": (
+                        f"system-template-"
+                        f"{blueprint['category_slug']}-light"
+                    ),
+                    "name": (
+                        f"{category.name} Recommendation Template Light"
+                    ),
+                    "description": (
+                        f"System light recommendation template for "
+                        f"{category.name.lower()} businesses."
+                    ),
+                    "source_type": (
+                        PaletteSource.RECOMMENDATION_TEMPLATE
+                    ),
+                    "theme_mode": ThemeMode.LIGHT,
+                    "visibility": PaletteVisibility.UNLISTED,
+                    "allow_export": False,
+                    "is_published": False,
+                    "colors": blueprint["light"],
+                },
+                {
+                    "slug": (
+                        f"system-template-"
+                        f"{blueprint['category_slug']}-dark"
+                    ),
+                    "name": (
+                        f"{category.name} Recommendation Template Dark"
+                    ),
+                    "description": (
+                        f"System dark recommendation template for "
+                        f"{category.name.lower()} businesses."
+                    ),
+                    "source_type": (
+                        PaletteSource.RECOMMENDATION_TEMPLATE
+                    ),
+                    "theme_mode": ThemeMode.DARK,
+                    "visibility": PaletteVisibility.UNLISTED,
+                    "allow_export": False,
+                    "is_published": False,
+                    "colors": blueprint["dark"],
+                },
+            ]
+
+            for variant in variants:
+                palette_created, current_color_counts = (
+                    self.upsert_palette(
+                        category=category,
+                        dominant_family=dominant_family,
+                        variant=variant,
+                    )
+                )
+
+                if palette_created:
+                    palette_counts["created"] += 1
+                else:
+                    palette_counts["updated"] += 1
+
+                color_counts["created"] += (
+                    current_color_counts["created"]
+                )
+
+                color_counts["updated"] += (
+                    current_color_counts["updated"]
+                )
+
+        self.stdout.write("")
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Preset and recommendation-template palettes "
+                "seeded successfully."
+            )
+        )
+
+        self.stdout.write(
+            f"Palettes: {palette_counts['created']} created, "
+            f"{palette_counts['updated']} updated."
+        )
+
+        self.stdout.write(
+            f"Palette colours: {color_counts['created']} created, "
+            f"{color_counts['updated']} updated."
+        )
+
+    def upsert_palette(
+        self,
+        category,
+        dominant_family,
+        variant,
+    ):
+        colors = variant["colors"]
+
+        self.validate_color_map(
+            palette_name=variant["name"],
+            colors=colors,
+        )
+
+        palette, palette_created = (
+            Palette.objects.update_or_create(
+                slug=variant["slug"],
+                defaults={
+                    "owner": None,
+                    "business_category": category,
+                    "dominant_color_family": dominant_family,
+                    "source_palette": None,
+                    "name": variant["name"],
+                    "description": variant["description"],
+                    "source_type": variant["source_type"],
+                    "theme_mode": variant["theme_mode"],
+                    "visibility": variant["visibility"],
+                    "moderation_status": (
+                        ModerationStatus.APPROVED
+                    ),
+                    "allow_export": variant["allow_export"],
+                    "is_published": variant["is_published"],
+                    "is_featured": False,
+                    "is_active": True,
+                },
+            )
+        )
+
+        color_counts = {
+            "created": 0,
+            "updated": 0,
+        }
+
+        expected_roles = set(ColorRole.values)
+
+        PaletteColor.objects.filter(
+            palette=palette,
+        ).exclude(
+            role__in=expected_roles,
+        ).delete()
+
+        for role in ColorRole.values:
+            _, color_created = (
+                PaletteColor.objects.update_or_create(
+                    palette=palette,
+                    role=role,
+                    defaults={
+                        "hex_value": colors[role],
+                    },
+                )
+            )
+
+            if color_created:
+                color_counts["created"] += 1
+            else:
+                color_counts["updated"] += 1
+
+        actual_roles = set(
+            PaletteColor.objects.filter(
+                palette=palette,
+            ).values_list(
+                "role",
+                flat=True,
+            )
+        )
+
+        if actual_roles != expected_roles:
+            missing_roles = sorted(
+                expected_roles - actual_roles
+            )
+
+            extra_roles = sorted(
+                actual_roles - expected_roles
+            )
+
+            raise CommandError(
+                f"Palette '{palette.name}' does not have the "
+                f"complete semantic colour system. "
+                f"Missing: {missing_roles}. Extra: {extra_roles}."
+            )
+
+        return palette_created, color_counts
+
+    def validate_color_map(self, palette_name, colors):
+        expected_roles = set(ColorRole.values)
+        supplied_roles = set(colors.keys())
+
+        missing_roles = sorted(
+            expected_roles - supplied_roles
+        )
+
+        extra_roles = sorted(
+            supplied_roles - expected_roles
+        )
+
+        if missing_roles or extra_roles:
+            raise CommandError(
+                f"Invalid colour map for '{palette_name}'. "
+                f"Missing roles: {missing_roles}. "
+                f"Unexpected roles: {extra_roles}."
+            )
+
+    def get_category(self, slug):
+        try:
+            return BusinessCategory.objects.get(
+                slug=slug,
+                is_active=True,
+            )
+        except BusinessCategory.DoesNotExist as exc:
+            raise CommandError(
+                f"Missing active business category '{slug}'. "
+                "Run: python manage.py seed_reference_data"
+            ) from exc
+
+    def get_color_family(self, slug):
+        try:
+            return ColorFamily.objects.get(
+                slug=slug,
+                is_active=True,
+            )
+        except ColorFamily.DoesNotExist as exc:
+            raise CommandError(
+                f"Missing active colour family '{slug}'. "
+                "Run: python manage.py seed_reference_data"
+            ) from exc
