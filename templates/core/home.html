@@ -1,0 +1,52 @@
+{% extends "base/base.html" %}
+
+{% block title %}
+    Skilite Build | Create, Preview and Export
+{% endblock %}
+
+{% block content %}
+<section class="section-padding">
+    <div class="container py-5">
+        <div class="text-center mx-auto" style="max-width: 760px;">
+            <div class="sk-icon mb-3">
+                <i class="fa-solid fa-palette"></i>
+            </div>
+
+            <h1 class="display-4 fw-bold mb-3">
+                Skilite Build
+            </h1>
+
+            <p class="lead sk-text-muted mb-4">
+                Create, preview, save, export and share professional
+                website colour systems.
+            </p>
+
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a
+                    href="{% url 'palettes:editor' %}"
+                    class="btn btn-primary"
+                >
+                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i>
+                    Start Creating
+                </a>
+
+                <a
+                    href="{% url 'recommendations:index' %}"
+                    class="btn btn-outline-primary"
+                >
+                    <i class="fa-solid fa-lightbulb me-2"></i>
+                    Recommendations
+                </a>
+
+                <a
+                    href="{% url 'community:gallery' %}"
+                    class="btn btn-outline-secondary"
+                >
+                    <i class="fa-solid fa-layer-group me-2"></i>
+                    Community Gallery
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
