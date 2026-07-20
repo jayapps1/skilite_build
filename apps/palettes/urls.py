@@ -1,6 +1,11 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
+from .views import (
+    PaletteCreateView,
+    PaletteUpdateView,
+)
+
 
 app_name = "palettes"
 
@@ -8,19 +13,14 @@ app_name = "palettes"
 urlpatterns = [
     path(
         "editor/",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "Manual Color Editor",
-                "page_message": (
-                    "Create and preview a professional website "
-                    "color palette."
-                ),
-            },
-        ),
+        PaletteCreateView.as_view(),
         name="editor",
     ),
-
+    path(
+        "<slug:slug>/edit/",
+        PaletteUpdateView.as_view(),
+        name="edit",
+    ),
     path(
         "my-palettes/",
         TemplateView.as_view(
@@ -34,7 +34,6 @@ urlpatterns = [
         ),
         name="my_palettes",
     ),
-
     path(
         "presets/",
         TemplateView.as_view(
@@ -42,8 +41,7 @@ urlpatterns = [
             extra_context={
                 "page_title": "Preset Palettes",
                 "page_message": (
-                    "Browse professional palettes created "
-                    "for different business categories."
+                    "Browse professional preset colour systems."
                 ),
             },
         ),
