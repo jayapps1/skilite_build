@@ -1,0 +1,235 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}
+    Colour Recommendations | Skilite Build
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/recommendations.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+<section class="recommendation-page py-5">
+    <div class="container">
+        <div class="row g-4 align-items-start">
+
+            <div class="col-lg-5">
+                <div class="recommendation-form-card">
+                    <span class="section-badge">
+                        Smart palette builder
+                    </span>
+
+                    <h1 class="display-6 fw-bold mt-3">
+                        Generate a business colour system
+                    </h1>
+
+                    <p class="text-secondary">
+                        Select the business type, visual style,
+                        colour preference, and theme. Skilite Build
+                        will create a complete 13-colour system.
+                    </p>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label
+                                    for="{{ field.id_for_label }}"
+                                    class="form-label fw-semibold"
+                                >
+                                    {{ field.label }}
+
+                                    {% if field.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+
+                                {{ field }}
+
+                                {% if field.help_text %}
+                                    <div class="form-text">
+                                        {{ field.help_text }}
+                                    </div>
+                                {% endif %}
+
+                                {% for error in field.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary btn-lg w-100"
+                        >
+                            <i class="fa-solid fa-wand-magic-sparkles me-2"></i>
+                            Generate recommendation
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                {% if generated_palette %}
+                    <div
+                        class="recommendation-result"
+                        style="
+                            --preview-primary: {{ preview_colors.PRIMARY }};
+                            --preview-secondary: {{ preview_colors.SECONDARY }};
+                            --preview-accent: {{ preview_colors.ACCENT }};
+                            --preview-background: {{ preview_colors.BACKGROUND }};
+                            --preview-surface: {{ preview_colors.SURFACE }};
+                            --preview-heading: {{ preview_colors.HEADING }};
+                            --preview-body: {{ preview_colors.BODY_TEXT }};
+                            --preview-muted: {{ preview_colors.MUTED_TEXT }};
+                            --preview-border: {{ preview_colors.BORDER }};
+                        "
+                    >
+                        <div class="result-heading">
+                            <div>
+                                <span class="section-badge">
+                                    Generated palette
+                                </span>
+
+                                <h2 class="h3 mt-2 mb-1">
+                                    {{ generated_palette.name }}
+                                </h2>
+
+                                <p class="text-secondary mb-0">
+                                    Rule:
+                                    {{ recommendation_request.selected_rule.name }}
+                                </p>
+                            </div>
+
+                            <span class="badge text-bg-success">
+                                Saved
+                            </span>
+                        </div>
+
+                        <div class="website-preview mt-4">
+                            <nav class="preview-navbar">
+                                <strong>Business Brand</strong>
+
+                                <div>
+                                    <span>Home</span>
+                                    <span>Services</span>
+                                    <span>Contact</span>
+                                </div>
+                            </nav>
+
+                            <div class="preview-hero">
+                                <span class="preview-kicker">
+                                    Trusted business solution
+                                </span>
+
+                                <h3>
+                                    Build a stronger digital presence
+                                </h3>
+
+                                <p>
+                                    A realistic website preview using
+                                    your generated semantic colour roles.
+                                </p>
+
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button type="button">
+                                        Get started
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="secondary-button"
+                                    >
+                                        Learn more
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="preview-cards">
+                                <article>
+                                    <h4>Professional</h4>
+                                    <p>
+                                        Colours selected for your
+                                        business category.
+                                    </p>
+                                </article>
+
+                                <article>
+                                    <h4>Accessible</h4>
+                                    <p>
+                                        Semantic roles are ready for
+                                        website components.
+                                    </p>
+                                </article>
+
+                                <article>
+                                    <h4>Editable</h4>
+                                    <p>
+                                        Continue refining the generated
+                                        palette in the editor.
+                                    </p>
+                                </article>
+                            </div>
+                        </div>
+
+                        <div class="palette-swatches mt-4">
+                            {% for color in generated_palette.colors.all %}
+                                <div class="palette-swatch">
+                                    <div
+                                        class="swatch-colour"
+                                        style="background-color: {{ color.hex_value }};"
+                                    ></div>
+
+                                    <div class="swatch-details">
+                                        <strong>
+                                            {{ color.get_role_display }}
+                                        </strong>
+
+                                        <code>{{ color.hex_value }}</code>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-result-card">
+                        <i class="fa-solid fa-palette"></i>
+
+                        <h2 class="h3">
+                            Your recommendation will appear here
+                        </h2>
+
+                        <p>
+                            Complete the form to generate a saved
+                            light or dark business palette containing
+                            all 13 semantic colour roles.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <script
+        src="{% static 'js/recommendations.js' %}"
+    ></script>
+{% endblock %}
