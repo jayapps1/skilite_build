@@ -358,7 +358,6 @@ class PalettePresetService:
         try:
             system_preset = (
                 Palette.objects
-                .select_for_update()
                 .select_related(
                     "business_category",
                     "dominant_color_family",
@@ -493,3 +492,90 @@ class PaletteLifecycleService:
         )
 
         return palette
+
+
+class PaletteCommunityService:
+    """
+    Handles duplication of public community palettes into private user copies.
+    """
+
+    @classmethod
+    @transaction.atomic
+    def copy_community_palette(
+        cls,
+        *,
+        source_palette,
+        user,
+    ):
+        """
+        Copy an active, published public palette for an authenticated user.
+
+        The created palette uses PaletteSource.COMMUNITY_COPY.
+        The copy record uses CopyType.COMMUNITY_COPY.
+        """
+        PaletteDuplicateService._validate_authenticated_user(user)
+
+        if source_palette is None:
+            raise ValidationError(
+                "A source palette is required."
+            )
+
+        if not source_palette.is_active or not source_palette.is_published:
+            raise ValidationError(
+                "An inactive or private palette cannot be copied."
+            )
+
+        color_map = (
+            PaletteDuplicateService
+            ._get_complete_color_map(
+                source_palette
+            )
+        )
+
+        destination_name = (
+            PaletteDuplicateService
+            ._build_palette_name(
+                prefix="Copy of",
+                source_palette=source_palette,
+            )
+        )
+
+        destination_palette = Palette(
+            owner=user,
+            business_category=(
+                source_palette.business_category
+            ),
+            dominant_color_family=(
+                source_palette.dominant_color_family
+            ),
+            source_palette=source_palette,
+            name=destination_name,
+            slug="",
+            description=source_palette.description,
+            source_type=PaletteSource.COMMUNITY_COPY,
+            theme_mode=source_palette.theme_mode,
+            visibility=PaletteVisibility.PRIVATE,
+            moderation_status=ModerationStatus.DRAFT,
+            allow_export=True,
+            is_published=False,
+            is_featured=False,
+            is_active=True,
+            published_at=None,
+        )
+
+        destination_palette.full_clean()
+        destination_palette.save()
+
+        PaletteDuplicateService._copy_palette_colors(
+            destination_palette=destination_palette,
+            color_map=color_map,
+        )
+
+        PaletteDuplicateService._create_copy_record(
+            copied_by=user,
+            source_palette=source_palette,
+            destination_palette=destination_palette,
+            copy_type=CopyType.COMMUNITY_COPY,
+        )
+
+        return destination_palette

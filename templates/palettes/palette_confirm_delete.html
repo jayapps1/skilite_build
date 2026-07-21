@@ -1,8 +1,12 @@
-{% extends "base/base.html" %}
+{% extends extend_template|default:"base/base.html" %}
 {% load static %}
 
 {% block title %}
     Delete {{ palette.name }} | Skilite Build
+{% endblock %}
+
+{% block dashboard_title %}
+    Delete Palette
 {% endblock %}
 
 {% block extra_css %}
@@ -13,7 +17,7 @@
 {% endblock %}
 
 {% block content %}
-<section class="delete-page py-5">
+<div class="py-2">
     <div class="container">
         <div class="delete-card">
 
@@ -67,5 +71,5 @@
 
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

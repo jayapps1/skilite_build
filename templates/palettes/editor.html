@@ -1,4 +1,4 @@
-{% extends "base/base.html" %}
+{% extends "base/base_dashboard.html" %}
 {% load static %}
 
 {% block title %}
@@ -10,6 +10,14 @@
     | Skilite Build
 {% endblock %}
 
+{% block dashboard_title %}
+    {% if is_editing %}
+        Edit {{ object.name }}
+    {% else %}
+        Create Palette
+    {% endif %}
+{% endblock %}
+
 {% block extra_css %}
     <link
         rel="stylesheet"
@@ -18,10 +26,9 @@
 {% endblock %}
 
 {% block content %}
-<section class="palette-editor-page py-4 py-lg-5">
-    <div class="container-fluid px-3 px-lg-4">
+<div class="py-2">
 
-        <div class="editor-heading mb-4">
+        <div class="editor-heading mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
                 <span class="editor-badge">
                     Semantic colour editor
@@ -40,6 +47,29 @@
                     them immediately on a business website.
                 </p>
             </div>
+
+            {% if is_editing and object.owner == request.user %}
+                <div>
+                    <form
+                        method="post"
+                        action="{% url 'palettes:publish' object.slug %}"
+                        class="d-inline"
+                    >
+                        {% csrf_token %}
+                        {% if object.is_published %}
+                            <button type="submit" class="btn btn-outline-warning">
+                                <i class="fa-solid fa-eye-slash me-1"></i>
+                                Unpublish
+                            </button>
+                        {% else %}
+                            <button type="submit" class="btn btn-outline-success">
+                                <i class="fa-solid fa-share me-1"></i>
+                                Publish
+                            </button>
+                        {% endif %}
+                    </form>
+                </div>
+            {% endif %}
         </div>
 
         <form method="post" id="palette-editor-form" novalidate>
@@ -55,7 +85,7 @@
 
             <div class="row g-4 align-items-start">
 
-                <div class="col-xl-5">
+                <div class="col-xl-4">
                     <div class="editor-panel mb-4">
                         <h2 class="h5 mb-3">
                             Palette information
@@ -149,6 +179,80 @@
                         </div>
                     </div>
 
+                    <!-- UI Component Color Mapper Panel -->
+                    <div class="editor-panel mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h2 class="h5 mb-1 text-heading">UI Style Mapper</h2>
+                                <p class="small text-secondary mb-0">Bind website sections to specific color roles.</p>
+                            </div>
+                            <span class="badge text-bg-success text-uppercase small">Mapping Settings</span>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label for="map-navbar-bg" class="form-label fw-semibold small text-secondary">Navbar Background</label>
+                                <select id="map-navbar-bg" class="form-select form-select-sm ui-color-mapper" data-css-var="--navbar-bg">
+                                    <option value="SURFACE" selected>Surface (Default)</option>
+                                    <option value="PRIMARY">Primary</option>
+                                    <option value="SECONDARY">Secondary</option>
+                                    <option value="BACKGROUND">Background</option>
+                                    <option value="ACCENT">Accent</option>
+                                    <option value="HEADING">Heading</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="map-footer-bg" class="form-label fw-semibold small text-secondary">Footer Background</label>
+                                <select id="map-footer-bg" class="form-select form-select-sm ui-color-mapper" data-css-var="--footer-bg">
+                                    <option value="SURFACE" selected>Surface (Default)</option>
+                                    <option value="PRIMARY">Primary</option>
+                                    <option value="SECONDARY">Secondary</option>
+                                    <option value="BACKGROUND">Background</option>
+                                    <option value="ACCENT">Accent</option>
+                                    <option value="HEADING">Heading</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="map-card-bg" class="form-label fw-semibold small text-secondary">Cards Background</label>
+                                <select id="map-card-bg" class="form-select form-select-sm ui-color-mapper" data-css-var="--card-bg">
+                                    <option value="SURFACE" selected>Surface (Default)</option>
+                                    <option value="PRIMARY">Primary</option>
+                                    <option value="SECONDARY">Secondary</option>
+                                    <option value="BACKGROUND">Background</option>
+                                    <option value="ACCENT">Accent</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="map-border-color" class="form-label fw-semibold small text-secondary">Outlines & Borders</label>
+                                <select id="map-border-color" class="form-select form-select-sm ui-color-mapper" data-css-var="--border-color">
+                                    <option value="BORDER" selected>Border (Default)</option>
+                                    <option value="PRIMARY">Primary</option>
+                                    <option value="SECONDARY">Secondary</option>
+                                    <option value="ACCENT">Accent</option>
+                                    <option value="MUTED_TEXT">Muted Text</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="map-btn-primary-bg" class="form-label fw-semibold small text-secondary">Primary Buttons</label>
+                                <select id="map-btn-primary-bg" class="form-select form-select-sm ui-color-mapper" data-css-var="--btn-primary-bg">
+                                    <option value="PRIMARY" selected>Primary (Default)</option>
+                                    <option value="SECONDARY">Secondary</option>
+                                    <option value="ACCENT">Accent</option>
+                                    <option value="SUCCESS">Success</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="map-hero-bg" class="form-label fw-semibold small text-secondary">Hero / Page Background</label>
+                                <select id="map-hero-bg" class="form-select form-select-sm ui-color-mapper" data-css-var="--hero-bg">
+                                    <option value="BACKGROUND" selected>Background (Default)</option>
+                                    <option value="SURFACE">Surface</option>
+                                    <option value="PRIMARY">Primary</option>
+                                    <option value="SECONDARY">Secondary</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="editor-panel">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
@@ -161,9 +265,10 @@
                                 </p>
                             </div>
 
-                            <span class="badge text-bg-primary">
-                                13 roles
-                            </span>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="auto-generate-colors" checked>
+                                <label class="form-check-label small fw-semibold text-secondary" for="auto-generate-colors">Auto-generate</label>
+                            </div>
                         </div>
 
                         <div class="semantic-colour-grid">
@@ -211,7 +316,7 @@
                     </div>
                 </div>
 
-                <div class="col-xl-7">
+                <div class="col-xl-8">
                     <div class="preview-column">
                         <div class="preview-toolbar">
                             <div>
@@ -239,117 +344,286 @@
                             class="live-business-preview"
                             id="live-business-preview"
                         >
-                            <nav class="business-preview-navbar">
-                                <strong id="preview-brand">
+                            <nav class="business-preview-navbar" id="preview-navbar-element">
+                                <strong id="preview-brand" class="preview-text-primary">
                                     Your Business
                                 </strong>
 
                                 <div class="preview-navigation-links">
-                                    <span>Home</span>
-                                    <span>Services</span>
-                                    <span>About</span>
-                                    <span>Contact</span>
+                                    <button type="button" class="preview-nav-link active" data-target="home">Home</button>
+                                    <button type="button" class="preview-nav-link" data-target="services">Services</button>
+                                    <button type="button" class="preview-nav-link" data-target="about">About</button>
+                                    <button type="button" class="preview-nav-link" data-target="contact">Contact</button>
+                                    <button type="button" class="preview-nav-link" data-target="profile">
+                                        <i class="fa-regular fa-user me-1"></i>Profile
+                                    </button>
                                 </div>
                             </nav>
 
-                            <section class="business-preview-hero">
-                                <span
-                                    class="business-preview-kicker"
-                                    id="preview-kicker"
-                                >
-                                    Professional business services
-                                </span>
+                            <div class="business-preview-main-content">
+                                <!-- Home Section -->
+                                <div id="preview-section-home" class="preview-section">
+                                    <section class="business-preview-hero" id="preview-hero-element">
+                                        <span
+                                            class="business-preview-kicker preview-text-accent"
+                                            id="preview-kicker"
+                                        >
+                                            Professional business services
+                                        </span>
 
-                                <h2 id="preview-headline">
-                                    Build a stronger digital presence
-                                </h2>
+                                        <h2 id="preview-headline" class="preview-text-heading">
+                                            Build a stronger digital presence
+                                        </h2>
 
-                                <p id="preview-description">
-                                    Preview a realistic website using
-                                    your semantic colour system.
-                                </p>
+                                        <p id="preview-description" class="preview-text-body">
+                                            Preview a realistic website using
+                                            your semantic colour system.
+                                        </p>
 
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <button
-                                        type="button"
-                                        class="preview-primary-button"
-                                    >
-                                        Get started
-                                    </button>
+                                        <div class="d-flex gap-2 flex-wrap justify-content-center">
+                                            <button
+                                                type="button"
+                                                id="preview-primary-btn"
+                                                class="preview-primary-button"
+                                            >
+                                                Get started
+                                            </button>
 
-                                    <button
-                                        type="button"
-                                        class="preview-secondary-button"
-                                    >
-                                        Learn more
-                                    </button>
+                                            <button
+                                                type="button"
+                                                id="preview-secondary-btn"
+                                                class="preview-secondary-button"
+                                            >
+                                                Learn more
+                                            </button>
+                                        </div>
+                                    </section>
                                 </div>
+
+                                <!-- Services Section -->
+                                <div id="preview-section-services" class="preview-section d-none p-4">
+                                    <div class="text-center mb-4">
+                                        <span class="business-preview-kicker text-uppercase small font-monospace preview-text-accent">Bespoke Solutions</span>
+                                        <h2 class="h3 fw-bold mt-1 preview-text-heading">Our Services</h2>
+                                        <p class="small preview-text-muted mb-0">High-quality services designed for your industry vertical.</p>
+                                    </div>
+                                    <section class="business-preview-services">
+                                        <article class="preview-card-element">
+                                            <div class="preview-icon">
+                                                <i id="preview-service-icon-0" class="fa-solid fa-briefcase"></i>
+                                            </div>
+
+                                            <h3 data-preview-service="0" class="preview-text-heading">
+                                                Professional Service
+                                            </h3>
+
+                                            <p id="preview-service-desc-0" class="preview-text-body">
+                                                Reliable services designed
+                                                around your requirements.
+                                            </p>
+                                        </article>
+
+                                        <article class="preview-card-element">
+                                            <div class="preview-icon">
+                                                <i id="preview-service-icon-1" class="fa-solid fa-headset"></i>
+                                            </div>
+
+                                            <h3 data-preview-service="1" class="preview-text-heading">
+                                                Customer Support
+                                            </h3>
+
+                                            <p id="preview-service-desc-1" class="preview-text-body">
+                                                Helpful support for customers
+                                                and business partners.
+                                            </p>
+                                        </article>
+
+                                        <article class="preview-card-element">
+                                            <div class="preview-icon">
+                                                <i id="preview-service-icon-2" class="fa-solid fa-chart-line"></i>
+                                            </div>
+
+                                            <h3 data-preview-service="2" class="preview-text-heading">
+                                                Business Solutions
+                                            </h3>
+
+                                            <p id="preview-service-desc-2" class="preview-text-body">
+                                                Practical solutions for growth
+                                                and long-term success.
+                                            </p>
+                                        </article>
+                                    </section>
+                                </div>
+
+                                <!-- About Section -->
+                                <div id="preview-section-about" class="preview-section d-none p-4">
+                                    <span class="business-preview-kicker text-uppercase small font-monospace preview-text-accent" id="preview-about-kicker">Who we are</span>
+                                    <h2 class="h3 fw-bold mb-3 mt-1 preview-text-heading" id="preview-about-headline">About Us</h2>
+                                    <p id="preview-about-description" class="mb-4 preview-text-body">We are a dedicated team of professionals committed to delivering outstanding solutions tailored to your unique business needs.</p>
+                                    
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="p-3 rounded h-100 preview-card-element">
+                                                <h4 class="h6 fw-bold mb-2 preview-text-heading">Our Vision</h4>
+                                                <p class="mb-0 small preview-text-body">To push boundaries and create sustainable, long-term value for our clients globally.</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="p-3 rounded h-100 preview-card-element">
+                                                <h4 class="h6 fw-bold mb-2 preview-text-heading">Our Commitment</h4>
+                                                <p class="mb-0 small preview-text-body">We value transparency, efficiency, and building solid professional relationships that last.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Contact Section -->
+                                <div id="preview-section-contact" class="preview-section d-none p-4">
+                                    <div class="text-center mb-4">
+                                        <span class="business-preview-kicker text-uppercase small font-monospace preview-text-accent">Get in touch</span>
+                                        <h2 class="h3 fw-bold mt-1 preview-text-heading">Contact Us</h2>
+                                        <p class="small preview-text-muted mb-0">Have questions? We would love to hear from you.</p>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-7">
+                                            <div class="p-3 rounded preview-card-element h-100">
+                                                <h4 class="h6 fw-bold mb-3 preview-text-heading"><i class="fa-regular fa-envelope me-2"></i>Send a Message</h4>
+                                                <form onsubmit="event.preventDefault();" class="d-flex flex-column gap-2">
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text preview-input-addon">
+                                                            <i class="fa-regular fa-user"></i>
+                                                        </span>
+                                                        <input type="text" class="form-control preview-input" placeholder="Your Name" disabled>
+                                                    </div>
+                                                    <div class="input-group input-group-sm mt-1">
+                                                        <span class="input-group-text preview-input-addon">
+                                                            <i class="fa-regular fa-envelope"></i>
+                                                        </span>
+                                                        <input type="email" class="form-control preview-input" placeholder="Your Email" disabled>
+                                                    </div>
+                                                    <div class="input-group input-group-sm mt-1">
+                                                        <span class="input-group-text preview-input-addon">
+                                                            <i class="fa-regular fa-comment"></i>
+                                                        </span>
+                                                        <textarea class="form-control preview-input" rows="2" placeholder="Your Message" disabled></textarea>
+                                                    </div>
+                                                    <button type="button" class="preview-primary-button btn-sm mt-2 px-3 py-1 text-white border-0" style="width: fit-content;">
+                                                        Send Message
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="p-3 rounded preview-card-element h-100 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <strong class="preview-text-heading" style="font-size: 0.9rem;"><i class="fa-solid fa-building me-2 text-primary"></i>Office Headquarters</strong>
+                                                    <div class="mt-2 d-flex flex-column gap-2" style="font-size: 0.8rem;">
+                                                        <div>
+                                                            <i class="fa-regular fa-envelope me-2 text-primary"></i>
+                                                            <span id="preview-contact-email" class="fw-medium preview-text-body">info@business.com</span>
+                                                        </div>
+                                                        <div>
+                                                            <i class="fa-solid fa-phone me-2 text-primary"></i>
+                                                            <span class="fw-medium preview-text-body">+233 (0) 555-0199</span>
+                                                        </div>
+                                                        <div>
+                                                            <i class="fa-solid fa-location-dot me-2 text-primary"></i>
+                                                            <span class="fw-medium preview-text-body">Accra Central, Ghana</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2 pt-2 preview-border-top" style="font-size: 0.75rem;">
+                                                    <strong class="preview-text-heading" style="display: block; margin-bottom: 0.25rem;">Support Hours:</strong>
+                                                    <span class="preview-text-muted">Mon - Fri: 9:00 AM - 5:00 PM GMT</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Profile Section -->
+                                <div id="preview-section-profile" class="preview-section d-none p-4">
+                                    <div class="text-center mb-4">
+                                        <span class="business-preview-kicker text-uppercase small font-monospace preview-text-accent">User Portal</span>
+                                        <h2 class="h3 fw-bold mt-1 preview-text-heading">User Account Profile</h2>
+                                        <p class="small preview-text-muted mb-0">Manage settings and colors on dashboard widgets.</p>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-5">
+                                            <div class="p-3 rounded preview-card-element text-center h-100">
+                                                <div class="preview-profile-avatar mb-3">
+                                                    JD
+                                                </div>
+                                                <h4 class="h6 fw-bold mb-1 preview-text-heading">John Doe</h4>
+                                                <span class="small preview-text-muted d-block mb-3">@johndoe</span>
+                                                
+                                                <div class="pt-3 preview-border-top d-flex flex-column gap-2 text-start" style="font-size: 0.78rem;">
+                                                    <div>
+                                                        <i class="fa-regular fa-envelope me-2 text-muted"></i>
+                                                        <span class="preview-text-body">john.doe@example.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <i class="fa-solid fa-user-shield me-2 text-muted"></i>
+                                                        <span class="preview-text-body">Role: Palette Designer</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-7">
+                                            <div class="p-3 rounded preview-card-element h-100">
+                                                <h4 class="h6 fw-bold mb-3 preview-text-heading"><i class="fa-solid fa-sliders me-2"></i>Mock Settings Dashboard</h4>
+                                                
+                                                <div class="d-flex flex-column gap-2 text-start" style="font-size: 0.8rem;">
+                                                    <div class="p-2 rounded d-flex justify-content-between align-items-center" style="background: rgba(0,0,0,0.03);">
+                                                        <span class="preview-text-body fw-medium">Receive Email Updates</span>
+                                                        <div class="form-check form-switch mb-0">
+                                                            <input class="form-check-input" type="checkbox" checked disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="p-2 rounded d-flex justify-content-between align-items-center" style="background: rgba(0,0,0,0.03);">
+                                                        <span class="preview-text-body fw-medium">Developer API Access</span>
+                                                        <div class="form-check form-switch mb-0">
+                                                            <input class="form-check-input" type="checkbox" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="p-2 rounded d-flex justify-content-between align-items-center" style="background: rgba(0,0,0,0.03);">
+                                                        <span class="preview-text-body fw-medium">Account Status</span>
+                                                        <span class="badge bg-success">Active</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status Telemetry Block -->
+                            <section class="preview-status-section p-3">
+                                <span class="preview-status success-status">Success</span>
+                                <span class="preview-status warning-status">Warning</span>
+                                <span class="preview-status danger-status">Danger</span>
+                                <span class="preview-status info-status">Information</span>
                             </section>
 
-                            <section class="business-preview-services">
-                                <article>
-                                    <div class="preview-icon">
-                                        <i class="fa-solid fa-briefcase"></i>
+                            <!-- Global Footer Preview -->
+                            <footer class="business-preview-footer" id="preview-footer-element">
+                                <div class="footer-grid">
+                                    <div class="footer-brand">
+                                        <strong id="preview-footer-brand" class="preview-text-heading">Your Business</strong>
+                                        <p class="small preview-text-muted mb-0">Professional bespoke color testing suite.</p>
                                     </div>
-
-                                    <h3 data-preview-service="0">
-                                        Professional Service
-                                    </h3>
-
-                                    <p>
-                                        Reliable services designed
-                                        around your requirements.
-                                    </p>
-                                </article>
-
-                                <article>
-                                    <div class="preview-icon">
-                                        <i class="fa-solid fa-headset"></i>
+                                    <div class="footer-links">
+                                        <span class="footer-link-btn" data-target="home">Home</span>
+                                        <span class="footer-link-btn" data-target="services">Services</span>
+                                        <span class="footer-link-btn" data-target="about">About</span>
+                                        <span class="footer-link-btn" data-target="contact">Contact</span>
+                                        <span class="footer-link-btn" data-target="profile">Profile</span>
                                     </div>
-
-                                    <h3 data-preview-service="1">
-                                        Customer Support
-                                    </h3>
-
-                                    <p>
-                                        Helpful support for customers
-                                        and business partners.
-                                    </p>
-                                </article>
-
-                                <article>
-                                    <div class="preview-icon">
-                                        <i class="fa-solid fa-chart-line"></i>
-                                    </div>
-
-                                    <h3 data-preview-service="2">
-                                        Business Solutions
-                                    </h3>
-
-                                    <p>
-                                        Practical solutions for growth
-                                        and long-term success.
-                                    </p>
-                                </article>
-                            </section>
-
-                            <section class="preview-status-section">
-                                <span class="preview-status success-status">
-                                    Success
-                                </span>
-
-                                <span class="preview-status warning-status">
-                                    Warning
-                                </span>
-
-                                <span class="preview-status danger-status">
-                                    Danger
-                                </span>
-
-                                <span class="preview-status info-status">
-                                    Information
-                                </span>
-                            </section>
+                                </div>
+                                <div class="footer-bottom mt-2 pt-2 preview-border-top">
+                                    <span class="small preview-text-muted">&copy; 2026 Skilite Build Client Preview. All rights reserved.</span>
+                                </div>
+                            </footer>
                         </div>
                     </div>
                 </div>
@@ -357,7 +631,7 @@
             </div>
         </form>
     </div>
-</section>
+</div>
 
 {{ business_preview_content|json_script:"business-preview-content" }}
 {% endblock %}

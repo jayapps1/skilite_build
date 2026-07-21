@@ -1,0 +1,73 @@
+{% extends extend_template|default:"base/base.html" %}
+{% load static %}
+
+{% block title %}Report Palette | Skilite Build{% endblock %}
+
+{% block dashboard_title %}
+    Report Palette
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/palette-detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="py-2">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="delete-card py-4 text-start">
+                <div class="delete-icon" style="background-color: rgba(220, 53, 69, 0.1); color: #dc2626;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+
+                <h1 class="h3 fw-bold text-center text-heading mb-2">Report Content</h1>
+                <p class="text-muted text-center small mb-4">
+                    You are reporting the public palette <strong class="text-heading">"{{ palette.name }}"</strong> published by @{{ palette.owner.username }}.
+                </p>
+
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            Please correct the errors below.
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="id_reason" class="form-label fw-semibold text-heading small">Reason for Report</label>
+                        <select name="reason" id="id_reason" class="form-select form-select-sm" required>
+                            <option value="" disabled selected>Select a reason...</option>
+                            <option value="Inappropriate name or description">Inappropriate name or description</option>
+                            <option value="Misleading colors or category match">Misleading colors or category match</option>
+                            <option value="Intellectual property violation">Intellectual property violation</option>
+                            <option value="Spam or duplicate submission">Spam or duplicate submission</option>
+                            <option value="Other issues">Other issues</option>
+                        </select>
+                        {% if form.reason.errors %}
+                            <div class="text-danger small mt-1">{{ form.reason.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_description" class="form-label fw-semibold text-heading small">Additional Details (Optional)</label>
+                        <textarea name="description" id="id_description" class="form-control form-control-sm" rows="4" placeholder="Provide any details to help the moderation team review this submission..."></textarea>
+                        {% if form.description.errors %}
+                            <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'community:gallery' %}" class="btn btn-sm btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-sm btn-danger px-4">
+                            <i class="fa-solid fa-flag me-1"></i>Submit Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

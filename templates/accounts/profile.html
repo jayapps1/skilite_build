@@ -1,0 +1,174 @@
+{% extends "base/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Profile | Skilite Build
+{% endblock %}
+
+{% block dashboard_title %}
+    Profile
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="py-2">
+    <div class="row g-4">
+        <!-- Profile details card -->
+        <div class="col-lg-4">
+            <div class="section-card text-center">
+                <div class="profile-avatar-wrapper">
+                    <div class="profile-avatar-large">
+                        {% if profile.profile_image %}
+                            <img src="{{ profile.profile_image.url }}" alt="{{ profile.display_name }}">
+                        {% else %}
+                            {{ request.user.username|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h2 class="h4 mb-1 fw-bold text-heading">
+                            {{ profile.display_name|default:request.user.username }}
+                        </h2>
+                        <p class="text-muted small mb-0">@{{ request.user.username }}</p>
+                    </div>
+                </div>
+
+                {% if profile.bio %}
+                    <p class="text-muted mb-4 fst-italic">
+                        "{{ profile.bio }}"
+                    </p>
+                {% endif %}
+
+                <hr class="my-4">
+
+                <div class="text-start">
+                    {% if profile.company_name %}
+                        <div class="mb-3">
+                            <span class="profile-info-label d-block">Company</span>
+                            <span class="profile-info-value"><i class="fa-solid fa-building me-2 text-primary"></i>{{ profile.company_name }}</span>
+                        </div>
+                    {% endif %}
+
+                    {% if profile.website_url %}
+                        <div class="mb-3">
+                            <span class="profile-info-label d-block">Website</span>
+                            <span class="profile-info-value">
+                                <a href="{{ profile.website_url }}" target="_blank" class="text-decoration-none">
+                                    <i class="fa-solid fa-globe me-2 text-success"></i>{{ profile.website_url }}
+                                </a>
+                            </span>
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <span class="profile-info-label d-block">Member Since</span>
+                        <span class="profile-info-value">
+                            <i class="fa-regular fa-calendar me-2 text-warning"></i>{{ request.user.date_joined|date:"F Y" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="d-grid mt-4">
+                    <a href="{% url 'accounts:settings' %}" class="btn btn-outline-primary">
+                        <i class="fa-solid fa-user-gear me-2"></i>Edit Profile Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Palettes list card -->
+        <div class="col-lg-8">
+            <div class="section-card">
+                <div class="section-card-title">
+                    <h3><i class="fa-solid fa-palette me-2 text-primary"></i>Palettes Registry</h3>
+                </div>
+
+                <!-- Profile Statistics -->
+                <div class="row g-3 mb-4 text-center">
+                    <div class="col-4">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="d-block h3 fw-bold text-heading mb-0">{{ total_palettes }}</span>
+                            <span class="text-muted small">Total</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="d-block h3 fw-bold text-success mb-0">{{ public_palettes }}</span>
+                            <span class="text-muted small">Public</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="d-block h3 fw-bold text-warning mb-0">{{ private_palettes }}</span>
+                            <span class="text-muted small">Private</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if palettes %}
+                    <div class="row g-3">
+                        {% for palette in palettes %}
+                            <div class="col-md-6">
+                                <article class="palette-list-item h-100 mb-0 justify-content-between">
+                                    <div>
+                                        <div class="palette-list-meta">
+                                            <a href="{% url 'palettes:detail' palette.slug %}" class="palette-list-name">
+                                                {{ palette.name }}
+                                            </a>
+                                            <span class="palette-badge {% if palette.visibility == 'PUBLIC' %}badge-public{% elif palette.visibility == 'PRIVATE' %}badge-private{% else %}badge-unlisted{% endif %}">
+                                                {{ palette.get_visibility_display }}
+                                            </span>
+                                        </div>
+
+                                        {% if palette.business_category %}
+                                            <div class="text-muted small mb-2">
+                                                <i class="fa-solid fa-briefcase me-1"></i>
+                                                {{ palette.business_category.name }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div>
+                                        <div class="palette-color-bar mb-3">
+                                            {% for color in palette.colors.all %}
+                                                <span style="background-color: {{ color.hex_value }};" 
+                                                      title="{{ color.get_role_display }}: {{ color.hex_value }}"></span>
+                                            {% empty %}
+                                                <div class="w-100 text-center text-muted small bg-light py-1">
+                                                    No colors
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="palette-list-actions">
+                                            <a href="{% url 'palettes:detail' palette.slug %}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa-solid fa-eye me-1"></i> View
+                                            </a>
+                                            <a href="{% url 'palettes:edit' palette.slug %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-home-data py-5">
+                        <i class="fa-solid fa-folder-open mb-3"></i>
+                        <h4>No palettes in repository</h4>
+                        <p class="text-muted">Once you save colour systems they will list here.</p>
+                        <div class="mt-4">
+                            <a href="{% url 'palettes:editor' %}" class="btn btn-primary">
+                                <i class="fa-solid fa-palette me-2"></i>Create Palette
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

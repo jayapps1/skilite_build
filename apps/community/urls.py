@@ -1,23 +1,12 @@
 from django.urls import path
-from django.views.generic import TemplateView
-
+from . import views
 
 app_name = "community"
 
-
 urlpatterns = [
-    path(
-        "",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "Community Gallery",
-                "page_message": (
-                    "Discover, like, copy, and export palettes "
-                    "published by the Skilite Build community."
-                ),
-            },
-        ),
-        name="gallery",
-    ),
+    path("", views.CommunityGalleryView.as_view(), name="gallery"),
+    path("copy/<slug:slug>/", views.CopyCommunityPaletteView.as_view(), name="copy"),
+    path("like/<slug:slug>/", views.PaletteLikeToggleView.as_view(), name="like"),
+    path("report/<slug:slug>/", views.PaletteReportView.as_view(), name="report"),
+    path("track-view/<slug:slug>/", views.TrackViewCountView.as_view(), name="track_view"),
 ]

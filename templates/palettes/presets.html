@@ -1,7 +1,11 @@
-{% extends "base/base.html" %}
+{% extends extend_template|default:"base/base.html" %}
 {% load static %}
 
 {% block title %}Preset Palettes | Skilite Build{% endblock %}
+
+{% block dashboard_title %}
+    Preset Gallery
+{% endblock %}
 
 {% block extra_css %}
 <link
@@ -63,7 +67,25 @@
                 class="preset-filter-form"
             >
                 <div class="row g-3 align-items-end">
-                    <div class="col-12 col-md-5">
+                    <div class="col-12 col-md-4">
+                        <label
+                            for="preset-search"
+                            class="form-label"
+                        >
+                            Search presets
+                        </label>
+
+                        <input
+                            type="text"
+                            id="preset-search"
+                            name="search"
+                            class="form-control"
+                            placeholder="Search by name or description..."
+                            value="{{ current_search }}"
+                        >
+                    </div>
+
+                    <div class="col-12 col-md-3">
                         <label
                             for="preset-category"
                             class="form-label"
@@ -93,7 +115,7 @@
                         </select>
                     </div>
 
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-3">
                         <label
                             for="preset-theme"
                             class="form-label"
@@ -123,21 +145,22 @@
                         </select>
                     </div>
 
-                    <div class="col-12 col-md-3">
-                        <div class="d-grid gap-2 d-sm-flex">
+                    <div class="col-12 col-md-2">
+                        <div class="d-grid gap-2 d-sm-flex justify-content-md-end">
                             <button
                                 type="submit"
                                 class="btn btn-primary flex-grow-1"
                             >
-                                <i class="fa-solid fa-filter me-2"></i>
+                                <i class="fa-solid fa-filter me-1"></i>
                                 Filter
                             </button>
 
-                            {% if selected_category or selected_theme %}
+                            {% if selected_category or selected_theme or current_search %}
                                 <a
                                     href="{% url 'palettes:presets' %}"
                                     class="btn btn-outline-secondary"
                                     aria-label="Clear filters"
+                                    title="Clear all filters"
                                 >
                                     <i class="fa-solid fa-xmark"></i>
                                 </a>
@@ -285,36 +308,54 @@
                                 </div>
                             </div>
 
-                            <footer class="preset-card-footer">
-                                <div class="preset-footer-note">
-                                    <i class="fa-solid fa-shield-halved"></i>
-                                    The original system preset remains protected.
-                                </div>
+                            <footer class="preset-card-footer d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-primary btn-sm preset-preview-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#presetPreviewModal"
+                                    data-name="{{ preset.name }}"
+                                    data-description="{{ preset.description }}"
+                                    data-category="{{ preset.business_category.name|default:'General' }}"
+                                    data-theme="{{ preset.get_theme_mode_display }}"
+                                    data-slug="{{ preset.slug }}"
+                                    data-apply-url="{% url 'palettes:apply_preset' preset.slug %}"
+                                    data-colors='[
+                                        {% for color in preset.preset_colors %}
+                                            {"role": "{{ color.role }}", "role_display": "{{ color.get_role_display }}", "hex": "{{ color.hex_value }}"}
+                                            {% if not forloop.last %},{% endif %}
+                                        {% endfor %}
+                                    ]'
+                                >
+                                    <i class="fa-solid fa-eye me-1"></i>
+                                    Preview Details
+                                </button>
 
                                 {% if request.user.is_authenticated %}
                                     <form
                                         method="post"
                                         action="{% url 'palettes:apply_preset' preset.slug %}"
+                                        class="m-0"
                                     >
                                         {% csrf_token %}
 
                                         <button
                                             type="submit"
-                                            class="btn btn-primary"
+                                            class="btn btn-primary btn-sm"
                                             {% if preset.preset_colors|length != 13 %}
                                                 disabled
                                             {% endif %}
                                         >
-                                            <i class="fa-solid fa-copy me-2"></i>
+                                            <i class="fa-solid fa-copy me-1"></i>
                                             Apply Preset
                                         </button>
                                     </form>
                                 {% else %}
                                     <a
                                         href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}"
-                                        class="btn btn-primary"
+                                        class="btn btn-primary btn-sm"
                                     >
-                                        <i class="fa-solid fa-right-to-bracket me-2"></i>
+                                        <i class="fa-solid fa-right-to-bracket me-1"></i>
                                         Sign in to Apply
                                     </a>
                                 {% endif %}
@@ -411,6 +452,194 @@
                 </a>
             </section>
         {% endif %}
-    </div>
 </section>
+
+<!-- Preset Preview Modal -->
+<div class="modal fade" id="presetPreviewModal" tabindex="-1" aria-labelledby="presetPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: var(--sk-radius-lg); overflow: hidden; border: 1px solid var(--sk-border);">
+            <div class="modal-header bg-light py-3" style="border-bottom: 1px solid var(--sk-border);">
+                <div>
+                    <span class="badge text-bg-primary mb-1 text-uppercase" id="modal-preset-category">Category</span>
+                    <span class="badge text-bg-secondary mb-1 text-uppercase" id="modal-preset-theme">Theme</span>
+                    <h2 class="modal-title h4 fw-bold text-heading" id="presetPreviewModalLabel">Preset Name</h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted mb-4" id="modal-preset-description">Description text here...</p>
+                
+                <div class="row g-4">
+                    <!-- Left: Colors List -->
+                    <div class="col-md-6">
+                        <h3 class="h6 fw-bold mb-3 text-heading uppercase"><i class="fa-solid fa-list me-2 text-primary"></i>Semantic Roles</h3>
+                        <div id="modal-colors-list" class="d-flex flex-column gap-2" style="max-height: 380px; overflow-y: auto; padding-right: 0.5rem;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Web Layout Mockup Preview -->
+                    <div class="col-md-6">
+                        <h3 class="h6 fw-bold mb-3 text-heading uppercase"><i class="fa-solid fa-desktop me-2 text-success"></i>Live Preview</h3>
+                        <div class="preset-preview-window m-0" id="mock-browser-window" style="height: 380px; display: flex; flex-direction: column;">
+                            <div class="preset-preview-browser" style="border-bottom: 1px solid var(--sk-border); padding: 0.5rem 0.75rem;">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div id="mock-preview-container" class="p-3 flex-grow-1 d-flex flex-column justify-content-between" style="overflow-y: auto; transition: background-color 0.2s ease;">
+                                <!-- Navbar Mock -->
+                                <div id="mock-navbar" class="d-flex justify-content-between align-items-center p-2 rounded mb-3" style="border: 1px solid transparent; font-size: 0.75rem;">
+                                    <strong id="mock-logo">BrandLogo</strong>
+                                    <div class="d-flex gap-2">
+                                        <span>Home</span>
+                                        <span>Features</span>
+                                    </div>
+                                </div>
+
+                                <!-- Hero Content Mock -->
+                                <div class="text-center my-auto py-2">
+                                    <span id="mock-badge" class="badge mb-2" style="font-size: 0.65rem;">ACCENT BADGE</span>
+                                    <h4 id="mock-heading" class="fw-bold mb-2" style="font-size: 1.15rem; transition: color 0.2s ease;">Headline Text</h4>
+                                    <p id="mock-body" class="mb-3" style="font-size: 0.8rem; line-height: 1.4; transition: color 0.2s ease;">This is how body text looks inside the card.</p>
+                                    
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button id="mock-btn-primary" class="btn btn-sm px-3" style="font-size: 0.72rem; font-weight: 700; border: 0;">Primary Action</button>
+                                        <button id="mock-btn-secondary" class="btn btn-sm px-3" style="font-size: 0.72rem; font-weight: 600; border: 1px solid transparent;">Secondary Action</button>
+                                    </div>
+                                </div>
+
+                                <!-- Footer/Border Mock -->
+                                <div id="mock-footer" class="text-center pt-2 mt-3" style="border-top: 1px solid transparent; font-size: 0.65rem;">
+                                    <span id="mock-muted-text">Muted copyright footer text</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light" style="border-top: 1px solid var(--sk-border);">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                {% if request.user.is_authenticated %}
+                    <form method="post" action="" id="modal-apply-form" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-copy me-2"></i>Apply Preset System
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i>Sign in to Apply
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const previewBtns = document.querySelectorAll(".preset-preview-btn");
+        
+        // Modal elements
+        const modalTitle = document.getElementById("presetPreviewModalLabel");
+        const modalCategory = document.getElementById("modal-preset-category");
+        const modalTheme = document.getElementById("modal-preset-theme");
+        const modalDescription = document.getElementById("modal-preset-description");
+        const modalColorsList = document.getElementById("modal-colors-list");
+        const modalApplyForm = document.getElementById("modal-apply-form");
+
+        // Mock browser elements
+        const mockBrowserWindow = document.getElementById("mock-browser-window");
+        const mockPreviewContainer = document.getElementById("mock-preview-container");
+        const mockNavbar = document.getElementById("mock-navbar");
+        const mockLogo = document.getElementById("mock-logo");
+        const mockBadge = document.getElementById("mock-badge");
+        const mockHeading = document.getElementById("mock-heading");
+        const mockBody = document.getElementById("mock-body");
+        const mockBtnPrimary = document.getElementById("mock-btn-primary");
+        const mockBtnSecondary = document.getElementById("mock-btn-secondary");
+        const mockFooter = document.getElementById("mock-footer");
+        const mockMutedText = document.getElementById("mock-muted-text");
+
+        previewBtns.forEach(btn => {
+            btn.addEventListener("click", function() {
+                const name = this.dataset.name;
+                const description = this.dataset.description;
+                const category = this.dataset.category;
+                const theme = this.dataset.theme;
+                const applyUrl = this.dataset.applyUrl;
+                const colors = JSON.parse(this.dataset.colors);
+
+                // Populate modal meta
+                modalTitle.textContent = name;
+                modalCategory.textContent = category;
+                modalTheme.textContent = theme;
+                modalDescription.textContent = description || "No description provided.";
+                
+                if (modalApplyForm) {
+                    modalApplyForm.action = applyUrl;
+                }
+
+                // Map colors list
+                modalColorsList.innerHTML = "";
+                let colorMap = {};
+                
+                colors.forEach(color => {
+                    colorMap[color.role] = color.hex;
+                    
+                    const item = document.createElement("div");
+                    item.className = "d-flex align-items-center justify-content-between p-2 rounded border bg-white";
+                    item.style.borderColor = "var(--sk-border)";
+                    item.innerHTML = `
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="display:inline-block; width:1.5rem; height:1.5rem; border-radius:0.4rem; border:1px solid rgba(0,0,0,0.1); background-color:${color.hex};"></span>
+                            <span class="small fw-bold text-heading">${color.role_display}</span>
+                        </div>
+                        <code>${color.hex}</code>
+                    `;
+                    modalColorsList.appendChild(item);
+                });
+
+                // Apply colors to the mock preview container
+                const primary = colorMap["PRIMARY"] || "#2563eb";
+                const secondary = colorMap["SECONDARY"] || "#64748b";
+                const accent = colorMap["ACCENT"] || "#f59e0b";
+                const bg = colorMap["BACKGROUND"] || "#f8fafc";
+                const surface = colorMap["SURFACE"] || "#ffffff";
+                const heading = colorMap["HEADING"] || "#0f172a";
+                const bodyText = colorMap["BODY_TEXT"] || "#334155";
+                const mutedText = colorMap["MUTED_TEXT"] || "#64748b";
+                const border = colorMap["BORDER"] || "#e2e8f0";
+
+                // Update DOM elements inside mock window
+                mockPreviewContainer.style.backgroundColor = bg;
+                
+                mockNavbar.style.backgroundColor = surface;
+                mockNavbar.style.borderColor = border;
+                mockNavbar.style.color = bodyText;
+                mockLogo.style.color = primary;
+
+                mockBadge.style.backgroundColor = primary;
+                mockBadge.style.color = "#ffffff";
+
+                mockHeading.style.color = heading;
+                mockHeading.textContent = name;
+                mockBody.style.color = bodyText;
+
+                mockBtnPrimary.style.backgroundColor = primary;
+                mockBtnPrimary.style.color = "#ffffff";
+
+                mockBtnSecondary.style.backgroundColor = surface;
+                mockBtnSecondary.style.borderColor = border;
+                mockBtnSecondary.style.color = secondary;
+
+                mockFooter.style.borderTopColor = border;
+                mockMutedText.style.color = mutedText;
+            });
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %}

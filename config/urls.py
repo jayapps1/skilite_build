@@ -8,6 +8,9 @@ urlpatterns = [
     # Django administration
     path("admin/", admin.site.urls),
 
+    # Language translation switching
+    path("i18n/", include("django.conf.urls.i18n")),
+
     # Public/core pages
     path("", include("apps.core.urls")),
 

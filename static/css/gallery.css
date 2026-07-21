@@ -1,0 +1,200 @@
+/* Gallery Page Stylesheet */
+.gallery-page {
+    position: relative;
+    min-height: calc(100vh - 80px);
+    background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 30rem), var(--bs-body-bg);
+}
+
+.gallery-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--sk-border);
+    margin-bottom: 2.5rem;
+}
+
+.gallery-eyebrow {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--sk-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+.gallery-title {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 800;
+    color: var(--sk-heading);
+}
+
+.gallery-subtitle {
+    max-width: 38rem;
+    color: var(--sk-body);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Filter Panel Styles */
+.gallery-filter-panel {
+    padding: 1.5rem;
+    border: 1px solid var(--sk-border);
+    border-radius: 1.25rem;
+    background: var(--sk-surface);
+    box-shadow: 0 0.5rem 1.5rem rgba(15, 23, 42, 0.04);
+}
+
+.gallery-filter-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--sk-border);
+}
+
+/* Card layout grid */
+.gallery-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
+    gap: 2rem;
+}
+
+@media (max-width: 767.98px) {
+    .gallery-card-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.gallery-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid var(--sk-border);
+    border-radius: 1.25rem;
+    background: var(--sk-surface);
+    box-shadow: 0 0.75rem 2rem rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.gallery-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 1.25rem 3rem rgba(15, 23, 42, 0.1);
+}
+
+.gallery-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--sk-border);
+}
+
+.gallery-card-title {
+    color: var(--sk-heading);
+    font-weight: 800;
+}
+
+.gallery-description {
+    font-size: 0.85rem;
+    color: var(--sk-body);
+    margin-top: 0.5rem;
+}
+
+.gallery-author {
+    font-size: 0.78rem;
+    color: var(--sk-muted);
+}
+
+/* Colour strips */
+.gallery-colour-strip {
+    display: flex;
+    height: 2.5rem;
+    cursor: pointer;
+}
+
+.gallery-strip-colour {
+    flex: 1;
+    height: 100%;
+    transition: flex-grow 0.2s ease;
+}
+
+.gallery-strip-colour:hover {
+    flex-grow: 1.4;
+}
+
+/* Metrics and Engagement Toolbar */
+.gallery-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(248, 250, 252, 0.5);
+    border-top: 1px solid var(--sk-border);
+}
+
+[data-bs-theme="dark"] .gallery-toolbar {
+    background: rgba(15, 23, 42, 0.2);
+}
+
+.gallery-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--sk-muted);
+}
+
+.btn-like {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: var(--sk-muted);
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s;
+}
+
+.btn-like.liked {
+    color: #ef4444;
+}
+
+.btn-like:hover {
+    color: #ef4444;
+}
+
+.btn-report {
+    color: var(--sk-muted);
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.btn-report:hover {
+    color: #dc2626;
+}
+
+.gallery-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--sk-border);
+    margin-top: auto;
+}

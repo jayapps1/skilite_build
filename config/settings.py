@@ -242,8 +242,44 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 
 # ======================================================
+# CACHE CONFIGURATION
+# ======================================================
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "skilite_build_cache",
+    }
+}
+
+
+# ======================================================
 # DEFAULT PRIMARY KEY
 # ======================================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# ======================================================
+# CUSTOM LANGUAGES REGISTRATION FOR DYNAMIC TRANSLATION
+# ======================================================
+import django.conf.locale
+
+EXTRA_LANG_INFO = {
+    "tw": {
+        "bidi": False,
+        "code": "tw",
+        "name": "Twi",
+        "name_local": "Twi",
+    },
+    "gaa": {
+        "bidi": False,
+        "code": "gaa",
+        "name": "Ga",
+        "name_local": "Ga",
+    },
+}
+
+django.conf.locale.LANG_INFO.update(EXTRA_LANG_INFO)
+
 

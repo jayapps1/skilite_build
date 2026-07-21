@@ -147,6 +147,13 @@ img {
     text-decoration: none;
 }
 
+.skilite-login-button:hover,
+.skilite-login-button:focus {
+    color: var(--sk-primary);
+    text-decoration: none;
+}
+
+
 .user-menu-button {
     display: flex;
     gap: 0.55rem;
@@ -847,4 +854,123 @@ img {
     .hero-statistics {
         gap: 1.25rem;
     }
+}
+
+/* Night Mode (Dark Theme) Variables and Element Styling */
+[data-bs-theme="dark"] {
+    --sk-background: #0b0f19;
+    --sk-surface: #111827;
+    --sk-border: #1f2937;
+    --sk-heading: #f9fafb;
+    --sk-body: #e5e7eb;
+    --sk-muted: #9ca3af;
+    --sk-primary-soft: rgba(37, 99, 235, 0.15);
+}
+
+[data-bs-theme="dark"] body {
+    background-color: var(--sk-background);
+    color: var(--sk-body);
+}
+
+[data-bs-theme="dark"] .skilite-navbar {
+    background: rgba(17, 24, 39, 0.94);
+    border-bottom: 1px solid rgba(31, 41, 55, 0.85);
+}
+
+[data-bs-theme="dark"] .skilite-navbar .nav-link {
+    color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .skilite-navbar .nav-link:hover,
+[data-bs-theme="dark"] .skilite-navbar .nav-link.active {
+    color: var(--sk-primary);
+}
+
+[data-bs-theme="dark"] .user-menu-button:hover {
+    background: #1f2937;
+}
+
+[data-bs-theme="dark"] .user-dropdown {
+    background-color: var(--sk-surface);
+    border-color: var(--sk-border);
+}
+
+[data-bs-theme="dark"] .user-dropdown-heading {
+    color: var(--sk-heading);
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: var(--sk-body);
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+    background-color: #1f2937;
+    color: var(--sk-heading);
+}
+
+[data-bs-theme="dark"] .home-hero {
+    background:
+        radial-gradient(
+            circle at 15% 15%,
+            rgba(37, 99, 235, 0.16),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 90% 20%,
+            rgba(124, 58, 237, 0.13),
+            transparent 28%
+        ),
+        linear-gradient(
+            180deg,
+            #111827,
+            #0b0f19
+        );
+}
+
+[data-bs-theme="dark"] .workflow-card,
+[data-bs-theme="dark"] .category-card,
+[data-bs-theme="dark"] .home-preset-card,
+[data-bs-theme="dark"] .semantic-role-grid article {
+    background-color: var(--sk-surface);
+    border-color: var(--sk-border);
+}
+
+[data-bs-theme="dark"] .hero-preview-card {
+    background-color: var(--sk-surface);
+    border-color: var(--sk-border);
+}
+
+[data-bs-theme="dark"] .preview-browser-toolbar {
+    background-color: #111827;
+    border-bottom: 1px solid var(--sk-border);
+}
+
+[data-bs-theme="dark"] .browser-address {
+    background-color: #1f2937;
+    border-color: var(--sk-border);
+    color: var(--sk-muted);
+}
+
+[data-bs-theme="dark"] .hero-business-preview {
+    background-color: #0b0f19;
+}
+
+[data-bs-theme="dark"] .hero-business-preview nav {
+    background-color: #111827;
+    border-bottom: 1px solid #1f2937;
+    color: #f9fafb;
+}
+
+[data-bs-theme="dark"] .hero-business-preview h2 {
+    color: #f9fafb;
+}
+
+[data-bs-theme="dark"] .hero-business-preview p {
+    color: #9ca3af;
+}
+
+[data-bs-theme="dark"] .hero-preview-cards article {
+    background-color: #111827;
+    border-color: #1f2937;
+    color: #e5e7eb;
 }

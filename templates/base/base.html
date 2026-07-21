@@ -1,9 +1,19 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.LANGUAGE_CODE|default:'en' }}">
 <head>
     <meta charset="UTF-8">
+
+    <script>
+        // Immediately set dark/light theme based on localStorage or user preference to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const userTheme = "{% if request.user.is_authenticated %}{{ request.user.profile.preferred_theme|lower }}{% endif %}";
+            const theme = savedTheme || userTheme || 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme.toLowerCase());
+        })();
+    </script>
 
     <meta
         name="viewport"
@@ -26,11 +36,13 @@
         rel="stylesheet"
     >
 
-    <!-- Replace YOUR_FONT_AWESOME_KIT with your working kit code. -->
-    <script
-        src="https://kit.fontawesome.com/YOUR_FONT_AWESOME_KIT.js"
+    <!-- Font Awesome CDN -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         crossorigin="anonymous"
-    ></script>
+        referrerpolicy="no-referrer"
+    >
 
     <link
         rel="stylesheet"

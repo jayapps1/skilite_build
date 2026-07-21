@@ -1,4 +1,8 @@
 from django.contrib import messages
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from apps.accounts.models import log_user_activity
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -292,6 +296,12 @@ class PaletteCreateView(
         response = self.save_editor_form(form)
 
         if not form.errors:
+            log_user_activity(
+                self.request,
+                self.request.user,
+                "Created Palette",
+                f"Created palette '{self.object.name}'",
+            )
             messages.success(
                 self.request,
                 "Your palette was created successfully.",
@@ -308,6 +318,20 @@ class PaletteUpdateView(
     slug_field = "slug"
     slug_url_kwarg = "slug"
 
+    def dispatch(self, request, *args, **kwargs):
+        slug = kwargs.get("slug")
+        if slug:
+            palette = Palette.objects.filter(slug=slug, is_active=True).first()
+            if palette and palette.owner != request.user:
+                log_user_activity(
+                    request,
+                    request.user,
+                    "Security Alert",
+                    f"Unauthorized access attempt to edit palette '{palette.name}' (ID: {palette.id})",
+                    is_priority=True,
+                )
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         return (
             Palette.objects
@@ -322,6 +346,12 @@ class PaletteUpdateView(
         response = self.save_editor_form(form)
 
         if not form.errors:
+            log_user_activity(
+                self.request,
+                self.request.user,
+                "Updated Palette",
+                f"Updated palette '{self.object.name}'",
+            )
             messages.success(
                 self.request,
                 "Your palette was updated successfully.",
@@ -560,6 +590,11 @@ class PresetPaletteListView(ListView):
             )
         )
 
+        search_term = self.request.GET.get(
+            "search",
+            "",
+        ).strip()
+
         category_slug = self.request.GET.get(
             "category",
             "",
@@ -569,6 +604,12 @@ class PresetPaletteListView(ListView):
             "theme",
             "",
         ).strip()
+
+        if search_term:
+            queryset = queryset.filter(
+                Q(name__icontains=search_term)
+                | Q(description__icontains=search_term)
+            )
 
         if category_slug:
             queryset = queryset.filter(
@@ -637,7 +678,18 @@ class PresetPaletteListView(ListView):
                     if selected_theme in ThemeMode.values
                     else ""
                 ),
+                "current_search": (
+                    self.request.GET.get(
+                        "search",
+                        "",
+                    ).strip()
+                ),
                 "filter_query": query_parameters.urlencode(),
+                "extend_template": (
+                    "base/base_dashboard.html"
+                    if self.request.user.is_authenticated
+                    else "base/base.html"
+                ),
             }
         )
 
@@ -704,6 +756,13 @@ class ApplyPresetView(
             ),
         )
 
+        log_user_activity(
+            request,
+            request.user,
+            "Applied Preset",
+            f"Applied preset system palette '{preset.name}'",
+        )
+
         return redirect(
             "palettes:edit",
             slug=copied_palette.slug,
@@ -722,6 +781,20 @@ class PaletteDetailView(
     context_object_name = "palette"
     slug_field = "slug"
     slug_url_kwarg = "slug"
+
+    def dispatch(self, request, *args, **kwargs):
+        slug = kwargs.get("slug")
+        if slug:
+            palette = Palette.objects.filter(slug=slug, is_active=True).first()
+            if palette and palette.owner != request.user:
+                log_user_activity(
+                    request,
+                    request.user,
+                    "Security Alert",
+                    f"Unauthorized access attempt to view palette '{palette.name}' (ID: {palette.id})",
+                    is_priority=True,
+                )
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return (
@@ -762,6 +835,11 @@ class PaletteDetailView(
                     color.role: color.hex_value
                     for color in ordered_colors
                 },
+                "extend_template": (
+                    "base/base_dashboard.html"
+                    if self.request.user.is_authenticated
+                    else "base/base.html"
+                ),
             }
         )
 
@@ -830,6 +908,29 @@ class PaletteDeleteView(
     slug_field = "slug"
     slug_url_kwarg = "slug"
 
+    def dispatch(self, request, *args, **kwargs):
+        slug = kwargs.get("slug")
+        if slug:
+            palette = Palette.objects.filter(slug=slug, is_active=True).first()
+            if palette and palette.owner != request.user:
+                log_user_activity(
+                    request,
+                    request.user,
+                    "Security Alert",
+                    f"Unauthorized access attempt to delete palette '{palette.name}' (ID: {palette.id})",
+                    is_priority=True,
+                )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["extend_template"] = (
+            "base/base_dashboard.html"
+            if self.request.user.is_authenticated
+            else "base/base.html"
+        )
+        return context
+
     def get_queryset(self):
         return Palette.objects.filter(
             owner=self.request.user,
@@ -843,6 +944,13 @@ class PaletteDeleteView(
             palette=self.object,
         )
 
+        log_user_activity(
+            self.request,
+            self.request.user,
+            "Deleted Palette",
+            f"Removed palette '{self.object.name}'",
+        )
+
         messages.success(
             request,
             (
@@ -852,3 +960,59 @@ class PaletteDeleteView(
         )
 
         return redirect("palettes:my_palettes")
+
+
+class PalettePublishView(LoginRequiredMixin, View):
+    """
+    Toggles a private user palette between private and public/community status.
+    """
+
+    def post(self, request, slug, *args, **kwargs):
+        palette = get_object_or_404(
+            Palette.objects.filter(
+                owner=request.user,
+                is_active=True,
+            ),
+            slug=slug,
+        )
+
+        if palette.is_published:
+            # Unpublish
+            palette.is_published = False
+            palette.visibility = PaletteVisibility.PRIVATE
+            palette.moderation_status = ModerationStatus.DRAFT
+            palette.published_at = None
+            log_user_activity(
+                request,
+                request.user,
+                "Unpublished Palette",
+                f"Unpublished palette '{palette.name}' (moved to private)",
+            )
+            messages.success(
+                request,
+                f"'{palette.name}' is now private and removed from the community gallery.",
+            )
+        else:
+            # Publish
+            palette.is_published = True
+            palette.visibility = PaletteVisibility.PUBLIC
+            palette.moderation_status = ModerationStatus.APPROVED
+            palette.published_at = timezone.now()
+            log_user_activity(
+                request,
+                request.user,
+                "Published Palette",
+                f"Published palette '{palette.name}' to the community",
+            )
+            messages.success(
+                request,
+                f"'{palette.name}' has been successfully published to the community gallery!",
+            )
+
+        palette.full_clean()
+        palette.save()
+
+        next_url = request.GET.get("next") or request.META.get("HTTP_REFERER")
+        if not next_url:
+            next_url = reverse("palettes:edit", kwargs={"slug": palette.slug})
+        return redirect(next_url)

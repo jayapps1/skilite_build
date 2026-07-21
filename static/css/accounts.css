@@ -1,0 +1,467 @@
+/* ======================================================
+   SKILITE BUILD — ACCOUNTS APP STYLESHEET
+   ====================================================== */
+
+/* Auth Pages (Login & Register) */
+.auth-wrapper {
+    min-height: calc(100vh - 160px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.05), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(124, 58, 237, 0.05), transparent 40%);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 480px;
+    padding: 2.5rem;
+    border: 1px solid var(--sk-border);
+    border-radius: var(--sk-radius-lg);
+    background: var(--sk-surface);
+    box-shadow: var(--sk-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sk-shadow-hover);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header h1 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--sk-heading);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.auth-header p {
+    color: var(--sk-muted);
+    font-size: 0.95rem;
+    margin-bottom: 0;
+}
+
+/* Custom form styles for Auth/Settings */
+.form-group-custom {
+    margin-bottom: 1.25rem;
+}
+
+.form-group-custom label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--sk-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-group-custom input,
+.form-group-custom textarea,
+.form-group-custom select {
+    display: block;
+    width: 100%;
+    border: 1.5px solid var(--sk-border);
+    border-radius: var(--sk-radius-sm);
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    color: var(--sk-body);
+    background-color: var(--sk-background);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group-custom input:focus,
+.form-group-custom textarea:focus,
+.form-group-custom select:focus {
+    border-color: var(--sk-primary);
+    box-shadow: 0 0 0 3px var(--sk-primary-soft);
+    background-color: var(--sk-surface);
+    outline: none;
+}
+
+.form-text {
+    font-size: 0.78rem;
+    color: var(--sk-muted);
+    margin-top: 0.35rem;
+}
+
+.form-errors {
+    color: var(--sk-danger);
+    font-size: 0.82rem;
+    margin-top: 0.35rem;
+    list-style: none;
+    padding-left: 0;
+}
+
+/* Dashboard Styles */
+.dashboard-header {
+    padding: 3rem 0 2rem;
+    background: linear-gradient(180deg, #ffffff, var(--sk-background));
+    border-bottom: 1px solid var(--sk-border);
+    margin-bottom: 3rem;
+}
+
+.dashboard-user-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.dashboard-avatar {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sk-primary), #7c3aed);
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+    font-weight: 800;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+.dashboard-user-info h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--sk-heading);
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.025em;
+}
+
+.dashboard-user-info p {
+    color: var(--sk-muted);
+    margin-bottom: 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    border: 1px solid var(--sk-border);
+    border-radius: var(--sk-radius);
+    background: var(--sk-surface);
+    box-shadow: var(--sk-shadow);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    background: var(--sk-primary-soft);
+    color: var(--sk-primary);
+    display: grid;
+    place-items: center;
+    font-size: 1.25rem;
+}
+
+.stat-card.stat-public .stat-icon {
+    background: #dcfce7;
+    color: var(--sk-success);
+}
+
+.stat-card.stat-private .stat-icon {
+    background: #fef3c7;
+    color: var(--sk-accent);
+}
+
+.stat-meta {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--sk-heading);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--sk-muted);
+    font-weight: 600;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 991.98px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.section-card {
+    padding: 2rem;
+    border: 1px solid var(--sk-border);
+    border-radius: var(--sk-radius);
+    background: var(--sk-surface);
+    box-shadow: var(--sk-shadow);
+    margin-bottom: 2rem;
+}
+
+.section-card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--sk-border);
+    padding-bottom: 1rem;
+}
+
+.section-card-title h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--sk-heading);
+    margin-bottom: 0;
+}
+
+/* Palette Card / Listing styling */
+.palette-list-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    border: 1px solid var(--sk-border);
+    border-radius: var(--sk-radius-sm);
+    background: var(--sk-background);
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.palette-list-item:hover {
+    transform: translateX(4px);
+    border-color: var(--sk-primary);
+}
+
+.palette-list-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.palette-list-name {
+    font-weight: 750;
+    color: var(--sk-heading);
+    text-decoration: none;
+    font-size: 1.05rem;
+}
+
+.palette-list-name:hover {
+    color: var(--sk-primary);
+}
+
+.palette-badge {
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+}
+
+.badge-public {
+    background-color: #dcfce7;
+    color: var(--sk-success);
+}
+
+.badge-private {
+    background-color: #fee2e2;
+    color: var(--sk-danger);
+}
+
+.badge-unlisted {
+    background-color: #f1f5f9;
+    color: var(--sk-secondary);
+}
+
+.palette-color-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(1px, 1fr));
+    height: 1.75rem;
+    border-radius: 0.4rem;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.palette-color-bar span {
+    height: 100%;
+}
+
+.palette-list-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* Profile Details & Image Uploader */
+.profile-avatar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.profile-avatar-large {
+    width: 6.5rem;
+    height: 6.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sk-primary), #7c3aed);
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    font-size: 2.75rem;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);
+    overflow: hidden;
+}
+
+.profile-avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-info-item {
+    padding: 0.75rem 1rem;
+    border-radius: var(--sk-radius-sm);
+    background: var(--sk-background);
+}
+
+.profile-info-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--sk-muted);
+    text-transform: uppercase;
+}
+
+.profile-info-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--sk-heading);
+}
+
+/* Tabbed Layout for Settings */
+.settings-nav {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 1.5px solid var(--sk-border);
+    margin-bottom: 2rem;
+    padding-bottom: 0.25rem;
+}
+
+.settings-tab-btn {
+    border: 0;
+    background: transparent;
+    padding: 0.75rem 1.25rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--sk-muted);
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+.settings-tab-btn:hover {
+    color: var(--sk-heading);
+}
+
+.settings-tab-btn.active {
+    color: var(--sk-primary);
+}
+
+.settings-tab-btn.active::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--sk-primary);
+    border-radius: 999px;
+}
+
+.settings-pane {
+    display: none;
+}
+
+.settings-pane.active {
+    display: block;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Night Mode (Dark Theme) Variables */
+[data-bs-theme="dark"] {
+    --sk-background: #0b0f19;
+    --sk-surface: #111827;
+    --sk-border: #1f2937;
+    --sk-heading: #f9fafb;
+    --sk-body: #e5e7eb;
+    --sk-muted: #9ca3af;
+    --sk-primary-soft: rgba(37, 99, 235, 0.15);
+}
+
+[data-bs-theme="dark"] .auth-card,
+[data-bs-theme="dark"] .section-card,
+[data-bs-theme="dark"] .stat-card {
+    background: var(--sk-surface);
+    border-color: var(--sk-border);
+}
+
+[data-bs-theme="dark"] .palette-list-item {
+    background: #1f2937;
+}
+
+[data-bs-theme="dark"] .form-group-custom input,
+[data-bs-theme="dark"] .form-group-custom textarea,
+[data-bs-theme="dark"] .form-group-custom select {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f3f4f6;
+}
+
+[data-bs-theme="dark"] .form-group-custom input:focus,
+[data-bs-theme="dark"] .form-group-custom textarea:focus,
+[data-bs-theme="dark"] .form-group-custom select:focus {
+    border-color: var(--sk-primary);
+    background-color: var(--sk-surface);
+}
+
+[data-bs-theme="dark"] .settings-tab-btn:hover {
+    color: #f3f4f6;
+}
+

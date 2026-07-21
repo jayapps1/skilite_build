@@ -1,89 +1,16 @@
 from django.urls import path
-from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
 
+from . import views
 
 app_name = "accounts"
 
-
 urlpatterns = [
-    path(
-        "login/",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "Login",
-                "page_message": (
-                    "The login form will be connected after "
-                    "the account models and forms are created."
-                ),
-            },
-        ),
-        name="login",
-    ),
-
-    path(
-        "register/",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "Create Account",
-                "page_message": (
-                    "The registration form will be connected "
-                    "after the custom user model is created."
-                ),
-            },
-        ),
-        name="register",
-    ),
-
-    path(
-        "dashboard/",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "Dashboard",
-                "page_message": (
-                    "Your Skilite Build dashboard is under development."
-                ),
-            },
-        ),
-        name="dashboard",
-    ),
-
-    path(
-        "profile/",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "My Profile",
-                "page_message": (
-                    "Profile management will be implemented soon."
-                ),
-            },
-        ),
-        name="profile",
-    ),
-
-    path(
-        "settings/",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "Account Settings",
-                "page_message": (
-                    "Account settings will be implemented soon."
-                ),
-            },
-        ),
-        name="settings",
-    ),
-
-    path(
-    "logout/",
-    LogoutView.as_view(
-        next_page="core:home",
-    ),
-    name="logout",
-),
+    path("login/", views.UserLoginView.as_view(), name="login"),
+    path("register/", views.UserRegisterView.as_view(), name="register"),
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
+    path("profile/", views.ProfileView.as_view(), name="profile"),
+    path("settings/", views.SettingsView.as_view(), name="settings"),
+    path("activity-log/", views.ActivityLogView.as_view(), name="activity_log"),
+    path("logout/", LogoutView.as_view(next_page="core:home"), name="logout"),
 ]

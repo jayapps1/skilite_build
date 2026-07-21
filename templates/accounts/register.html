@@ -1,0 +1,71 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}
+    Skilite Build | Register
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <a class="skilite-brand mb-3" href="{% url 'core:home' %}">
+                <span class="brand-symbol">
+                    <i class="fa-solid fa-palette"></i>
+                </span>
+                <span class="brand-name">
+                    Skilite <strong>Build</strong>
+                </span>
+            </a>
+            <h1>Create Account</h1>
+            <p>Join the website color-system builder</p>
+        </div>
+
+        <form method="post" action="{% url 'accounts:register' %}" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group-custom">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text|safe }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="form-errors">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary w-100 py-3 mt-2">
+                <i class="fa-solid fa-user-plus me-2"></i>Register Account
+            </button>
+        </form>
+
+        <hr class="my-4 text-muted">
+
+        <div class="text-center">
+            <span class="text-muted small">Already have an account?</span>
+            <a href="{% url 'accounts:login' %}" class="btn btn-link text-decoration-none p-0 ms-1 fw-bold">
+                Sign in instead
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

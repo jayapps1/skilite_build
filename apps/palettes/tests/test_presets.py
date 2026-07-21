@@ -123,7 +123,7 @@ class PresetPaletteWorkflowTests(TestCase):
                 source_type=(
                     PaletteSource.RECOMMENDATION_TEMPLATE
                 ),
-                visibility=PaletteVisibility.PRIVATE,
+                visibility=PaletteVisibility.PUBLIC,
                 is_published=False,
             )
         )
@@ -136,7 +136,7 @@ class PresetPaletteWorkflowTests(TestCase):
             theme_mode=ThemeMode.LIGHT,
             primary_hex="#60A5FA",
             owner=cls.other_user,
-            source_type=PaletteSource.DUPLICATE,
+            source_type=PaletteSource.MANUAL,
             visibility=PaletteVisibility.PRIVATE,
             moderation_status=ModerationStatus.DRAFT,
             is_published=False,

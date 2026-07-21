@@ -118,13 +118,31 @@
     --preview-danger: #dc2626;
     --preview-info: #0284c7;
 
-    overflow: hidden;
+    height: 600px;
+    overflow-y: auto;
     border: 1px solid var(--preview-border);
     border-top: 0;
     border-radius: 0 0 1rem 1rem;
     background: var(--preview-background);
     color: var(--preview-body-text);
     box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.08);
+}
+
+.live-business-preview::-webkit-scrollbar {
+    width: 6px;
+}
+
+.live-business-preview::-webkit-scrollbar-track {
+    background: var(--preview-surface);
+}
+
+.live-business-preview::-webkit-scrollbar-thumb {
+    background: var(--preview-border);
+    border-radius: 3px;
+}
+
+.live-business-preview::-webkit-scrollbar-thumb:hover {
+    background: var(--preview-primary);
 }
 
 .business-preview-navbar {
@@ -139,9 +157,26 @@
 
 .preview-navigation-links {
     display: flex;
-    gap: 1rem;
+    gap: 1.25rem;
+}
+
+.preview-nav-link {
+    background: transparent;
+    border: 0;
+    padding: 0 0 2px 0;
     color: var(--preview-muted-text);
     font-size: 0.86rem;
+    font-weight: 650;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.preview-nav-link:hover {
+    color: var(--preview-primary);
+}
+
+.preview-nav-link.active {
+    color: var(--preview-primary);
+    border-bottom: 2px solid var(--preview-primary);
 }
 
 .business-preview-hero {
@@ -275,4 +310,105 @@
     .preview-navigation-links {
         flex-wrap: wrap;
     }
+}
+
+/* UI Mapper Custom Variables Bindings */
+.business-preview-navbar {
+    background-color: var(--navbar-bg, var(--preview-surface)) !important;
+}
+
+.business-preview-hero {
+    background-color: var(--hero-bg, var(--preview-background)) !important;
+}
+
+.preview-card-element {
+    background-color: var(--card-bg, var(--preview-surface)) !important;
+    border: 1px solid var(--border-color, var(--preview-border)) !important;
+    color: var(--preview-body-text) !important;
+}
+
+.preview-input-addon,
+.preview-input {
+    background-color: var(--card-bg, var(--preview-surface)) !important;
+    border-color: var(--border-color, var(--preview-border)) !important;
+    color: var(--preview-body-text) !important;
+}
+
+.preview-border-top {
+    border-top: 1px solid var(--border-color, var(--preview-border)) !important;
+}
+
+.preview-primary-button {
+    background-color: var(--btn-primary-bg, var(--preview-primary)) !important;
+    border-color: var(--btn-primary-bg, var(--preview-primary)) !important;
+    color: var(--preview-surface) !important;
+}
+
+/* Dynamic color helpers */
+.preview-text-primary {
+    color: var(--preview-primary) !important;
+}
+.preview-text-secondary {
+    color: var(--preview-secondary) !important;
+}
+.preview-text-accent {
+    color: var(--preview-accent) !important;
+}
+.preview-text-heading {
+    color: var(--preview-heading) !important;
+}
+.preview-text-body {
+    color: var(--preview-body-text) !important;
+}
+.preview-text-muted {
+    color: var(--preview-muted-text) !important;
+}
+
+/* Footer Section Styles */
+.business-preview-footer {
+    padding: 1.5rem clamp(1.5rem, 5vw, 4rem);
+    background-color: var(--footer-bg, var(--preview-surface));
+    border-top: 1px solid var(--border-color, var(--preview-border));
+    color: var(--preview-body-text);
+}
+
+.footer-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.footer-link-btn {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--preview-muted-text);
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.footer-link-btn:hover {
+    color: var(--preview-primary);
+}
+
+/* Profile Section Styles */
+.preview-profile-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background-color: var(--preview-primary);
+    color: var(--preview-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 auto;
+    border: 2px solid var(--border-color, var(--preview-border));
 }

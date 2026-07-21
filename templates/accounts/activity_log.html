@@ -1,0 +1,97 @@
+{% extends "base/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Activity Log | Skilite Build
+{% endblock %}
+
+{% block dashboard_title %}
+    Activity Log
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="py-2">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h3 class="fw-bold mb-1 text-heading">Security Audit Registry</h3>
+            <p class="text-muted small mb-0">Review the first 50 security actions and activities recorded on your account.</p>
+        </div>
+    </div>
+
+    <!-- Activity Log List -->
+    <div class="section-card">
+        <div class="section-card-title border-bottom pb-3 mb-3">
+            <h3><i class="fa-solid fa-shield-halved me-2 text-primary"></i>Audit Log Directory</h3>
+        </div>
+
+        {% if logs %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" style="font-size: 0.9rem;">
+                    <thead>
+                        <tr class="text-secondary" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                            <th scope="col" style="width: 20%;">Time</th>
+                            <th scope="col" style="width: 20%;">Action</th>
+                            <th scope="col" style="width: 45%;">Details</th>
+                            <th scope="col" style="width: 15%;">IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                            <tr class="{% if log.is_priority %}table-danger-light border-start border-danger border-3{% endif %}">
+                                <td class="text-nowrap text-secondary">
+                                    <i class="fa-regular fa-clock me-1 text-muted"></i>
+                                    {{ log.created_at|date:"M j, Y, g:i a" }}
+                                </td>
+                                <td>
+                                    {% if log.is_priority %}
+                                        <span class="badge bg-danger text-white px-2.5 py-1.5 fw-semibold d-inline-flex align-items-center gap-1">
+                                            <i class="fa-solid fa-triangle-exclamation"></i>
+                                            {{ log.action }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark border px-2.5 py-1.5 fw-medium">
+                                            {{ log.action }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="{% if log.is_priority %}text-danger fw-semibold{% else %}text-heading{% endif %}">
+                                        {{ log.details }}
+                                    </div>
+                                </td>
+                                <td class="font-monospace text-secondary" style="font-size: 0.82rem;">
+                                    <i class="fa-solid fa-network-wired me-1 text-muted"></i>
+                                    {{ log.ip_address|default:"Unknown" }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-home-data py-5">
+                <i class="fa-solid fa-shield mb-3 text-muted"></i>
+                <h4>No activities recorded yet</h4>
+                <p class="text-muted">Security and user actions will be cataloged and listed here.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* Styling to make priority breach rows stand out elegantly */
+    .table-danger-light {
+        background-color: rgba(220, 53, 69, 0.05) !important;
+    }
+    .table-danger-light:hover {
+        background-color: rgba(220, 53, 69, 0.08) !important;
+    }
+    .text-heading {
+        color: var(--text-heading, #1e293b);
+    }
+</style>
+{% endblock %}

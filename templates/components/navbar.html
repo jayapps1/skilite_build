@@ -100,6 +100,41 @@
 
             <div class="navbar-actions">
 
+                <!-- Language Switcher Dropdown -->
+                {% load i18n %}
+                <form action="{% url 'set_language' %}" method="post" class="d-inline" id="lang-switch-form">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                    <div class="dropdown d-inline">
+                        <button class="btn btn-link text-heading p-0 dropdown-toggle text-decoration-none fw-bold me-2 align-middle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: var(--sk-heading); font-size: 0.88rem;">
+                            <i class="fa-solid fa-language me-1 text-primary fs-5 align-middle"></i>
+                            {% get_current_language as CURRENT_LANG %}
+                            {% if CURRENT_LANG == 'en' %}EN
+                            {% elif CURRENT_LANG == 'tw' %}TW
+                            {% elif CURRENT_LANG == 'gaa' %}GA
+                            {% elif CURRENT_LANG == 'fr' %}FR
+                            {% else %}{{ CURRENT_LANG|upper }}
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% get_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            {% for language in languages %}
+                                <li>
+                                    <button type="submit" name="language" value="{{ language.code }}" class="dropdown-item {% if language.code == CURRENT_LANG %}active{% endif %}">
+                                        {{ language.name_local }} ({{ language.code|upper }})
+                                    </button>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </form>
+
+                <!-- Theme Toggle Button -->
+                <button class="btn btn-link text-heading p-0 me-3 text-decoration-none align-middle" id="theme-toggle-btn" type="button" aria-label="Toggle Night Mode" style="color: var(--sk-heading);">
+                    <i class="fa-solid fa-moon text-primary fs-5 align-middle" id="theme-toggle-icon"></i>
+                </button>
+
                 {% if request.user.is_authenticated %}
 
                     <a

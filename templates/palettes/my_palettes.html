@@ -1,8 +1,12 @@
-{% extends "base/base.html" %}
+{% extends "base/base_dashboard.html" %}
 {% load static %}
 
 {% block title %}
     My Palettes | Skilite Build
+{% endblock %}
+
+{% block dashboard_title %}
+    My Palettes
 {% endblock %}
 
 {% block extra_css %}
@@ -13,8 +17,7 @@
 {% endblock %}
 
 {% block content %}
-<section class="my-palettes-page py-5">
-    <div class="container">
+<div class="py-2">
 
         <div class="page-heading">
             <div>
@@ -503,5 +506,5 @@
         {% endif %}
 
     </div>
-</section>
+</div>
 {% endblock %}

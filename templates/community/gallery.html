@@ -1,0 +1,471 @@
+{% extends extend_template|default:"base/base.html" %}
+{% load static %}
+
+{% block title %}Community Gallery | Skilite Build{% endblock %}
+
+{% block dashboard_title %}
+    Community Gallery
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/presets.css' %}">
+<link rel="stylesheet" href="{% static 'css/gallery.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="gallery-page py-2">
+    <div class="container">
+        <header class="gallery-hero mb-4">
+            <div>
+                <span class="gallery-eyebrow">Public Color Systems</span>
+                <h1 class="gallery-title">Community Gallery</h1>
+                <p class="gallery-subtitle mb-0">
+                    Discover, like, copy, and export custom semantic palettes published by other designers in the Skilite Build community.
+                </p>
+            </div>
+        </header>
+
+        <!-- Filters Section -->
+        <section class="gallery-filter-panel mb-4" aria-labelledby="gallery-filter-heading">
+            <div class="gallery-filter-heading">
+                <div>
+                    <h2 id="gallery-filter-heading" class="h5 mb-1 text-heading">Filter Palettes</h2>
+                    <p class="text-muted small mb-0">Browse community submissions by keyword, business category, theme, or sort popularity.</p>
+                </div>
+            </div>
+
+            <form method="get" class="gallery-filter-form">
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-3">
+                        <label for="gallery-search" class="form-label fw-semibold small">Search Keywords</label>
+                        <input type="text" id="gallery-search" name="search" class="form-control" placeholder="Search name, description, author..." value="{{ current_search }}">
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <label for="gallery-category" class="form-label fw-semibold small">Business Category</label>
+                        <select id="gallery-category" name="category" class="form-select">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category.slug }}" {% if selected_category == category.slug %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-2">
+                        <label for="gallery-theme" class="form-label fw-semibold small">Theme</label>
+                        <select id="gallery-theme" name="theme" class="form-select">
+                            <option value="">All Themes</option>
+                            {% for value, label in theme_choices %}
+                                <option value="{{ value }}" {% if selected_theme == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-2">
+                        <label for="gallery-sort" class="form-label fw-semibold small">Sort By</label>
+                        <select id="gallery-sort" name="sort" class="form-select">
+                            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest</option>
+                            <option value="likes" {% if current_sort == 'likes' %}selected{% endif %}>Most Liked</option>
+                            <option value="views" {% if current_sort == 'views' %}selected{% endif %}>Most Viewed</option>
+                            <option value="alphabetical" {% if current_sort == 'alphabetical' %}selected{% endif %}>Alphabetical</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-2">
+                        <div class="d-grid gap-2 d-sm-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary flex-grow-1">
+                                <i class="fa-solid fa-filter me-1"></i>Filter
+                            </button>
+                            {% if selected_category or selected_theme or current_search or current_sort != 'newest' %}
+                                <a href="{% url 'community:gallery' %}" class="btn btn-outline-secondary" title="Clear Filters">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Gallery Grid -->
+        {% if palettes %}
+            <div class="gallery-card-grid">
+                {% for palette in palettes %}
+                    <div class="col-12">
+                        <article class="gallery-card h-100">
+                            <div class="gallery-card-header">
+                                <div>
+                                    <div class="preset-badges mb-2">
+                                        {% if palette.business_category %}
+                                            <span class="badge text-bg-light">
+                                                <i class="fa-solid fa-briefcase me-1 text-primary"></i>
+                                                {{ palette.business_category.name }}
+                                            </span>
+                                        {% endif %}
+                                        <span class="badge text-bg-light">
+                                            <i class="fa-solid fa-circle-half-stroke me-1 text-secondary"></i>
+                                            {{ palette.get_theme_mode_display }}
+                                        </span>
+                                    </div>
+                                    <h2 class="gallery-card-title h5 mb-1 text-heading">{{ palette.name }}</h2>
+                                    <span class="gallery-author">Published by <strong class="text-heading">@{{ palette.owner.username }}</strong></span>
+                                </div>
+                            </div>
+
+                            <!-- Color Strip -->
+                            <div class="gallery-colour-strip" aria-label="{{ palette.name }} color strip">
+                                {% for color in palette.card_colors %}
+                                    <span class="gallery-strip-colour" style="background-color: {{ color.hex_value }};" title="{{ color.get_role_display }}: {{ color.hex_value }}"></span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- engagement metrics toolbar -->
+                            <div class="gallery-toolbar">
+                                <div class="gallery-stats">
+                                    <!-- AJAX Like Button -->
+                                    {% if request.user.is_authenticated %}
+                                        <button type="button" class="btn-like {% if palette.id in user_liked_ids %}liked{% endif %}" data-slug="{{ palette.slug }}">
+                                            <i class="{% if palette.id in user_liked_ids %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+                                            <span class="like-count">{{ palette.likes_count }}</span>
+                                        </button>
+                                    {% else %}
+                                        <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="stat-item text-decoration-none" title="Log in to like">
+                                            <i class="fa-regular fa-heart"></i>
+                                            <span>{{ palette.likes_count }}</span>
+                                        </a>
+                                    {% endif %}
+
+                                    <div class="stat-item" title="Unique views">
+                                        <i class="fa-regular fa-eye"></i>
+                                        <span class="view-count-text-{{ palette.slug }}">{{ palette.views_count }}</span>
+                                    </div>
+
+                                    <div class="stat-item" title="Cloned copies">
+                                        <i class="fa-regular fa-copy"></i>
+                                        <span>{{ palette.copy_records.count }}</span>
+                                    </div>
+                                </div>
+
+                                {% if request.user.is_authenticated and palette.owner != request.user %}
+                                    <a href="{% url 'community:report' palette.slug %}" class="btn-report">
+                                        <i class="fa-regular fa-flag me-1"></i>Report
+                                    </a>
+                                {% endif %}
+                            </div>
+
+                            <div class="gallery-card-footer">
+                                <button type="button" class="btn btn-outline-primary btn-sm preset-preview-btn" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#presetPreviewModal"
+                                    data-name="{{ palette.name }}"
+                                    data-description="{{ palette.description }}"
+                                    data-category="{{ palette.business_category.name|default:'General' }}"
+                                    data-theme="{{ palette.get_theme_mode_display }}"
+                                    data-slug="{{ palette.slug }}"
+                                    data-apply-url="{% url 'community:copy' palette.slug %}"
+                                    data-colors='[
+                                        {% for color in palette.card_colors %}
+                                            {"role": "{{ color.role }}", "role_display": "{{ color.get_role_display }}", "hex": "{{ color.hex_value }}"}
+                                            {% if not forloop.last %},{% endif %}
+                                        {% endfor %}
+                                    ]'>
+                                    <i class="fa-solid fa-eye me-1"></i>Preview Details
+                                </button>
+
+                                {% if request.user.is_authenticated %}
+                                    <form method="post" action="{% url 'community:copy' palette.slug %}" class="m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="fa-solid fa-copy me-1"></i>Copy Palette
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary btn-sm">
+                                        <i class="fa-solid fa-right-to-bracket me-1"></i>Sign in to Copy
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <nav class="preset-pagination mt-5" aria-label="Community pages">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if filter_query %}{{ filter_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                        {% endif %}
+
+                        {% for page in page_obj.paginator.page_range %}
+                            {% if page == page_obj.number %}
+                                <li class="page-item active" aria-current="page"><span class="page-link">{{ page }}</span></li>
+                            {% elif page >= page_obj.number|add:"-2" and page <= page_obj.number|add:"2" %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% if filter_query %}{{ filter_query }}&{% endif %}page={{ page }}">{{ page }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if filter_query %}{{ filter_query }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">Next</span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <section class="preset-empty-state">
+                <div class="preset-empty-icon"><i class="fa-solid fa-palette"></i></div>
+                <h2 class="h4 text-heading">No community palettes match your query</h2>
+                <p class="text-muted">Try clearing the search query or selecting other filters.</p>
+                <a href="{% url 'community:gallery' %}" class="btn btn-primary">View All Submissions</a>
+            </section>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="presetPreviewModal" tabindex="-1" aria-labelledby="presetPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: var(--sk-radius-lg); overflow: hidden; border: 1px solid var(--sk-border);">
+            <div class="modal-header bg-light py-3" style="border-bottom: 1px solid var(--sk-border);">
+                <div>
+                    <span class="badge text-bg-primary mb-1 text-uppercase" id="modal-preset-category">Category</span>
+                    <span class="badge text-bg-secondary mb-1 text-uppercase" id="modal-preset-theme">Theme</span>
+                    <h2 class="modal-title h4 fw-bold text-heading" id="presetPreviewModalLabel">Palette Name</h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted mb-4" id="modal-preset-description">Description text here...</p>
+                
+                <div class="row g-4">
+                    <!-- Left: Colors -->
+                    <div class="col-md-6">
+                        <h3 class="h6 fw-bold mb-3 text-heading uppercase"><i class="fa-solid fa-list me-2 text-primary"></i>Semantic Roles</h3>
+                        <div id="modal-colors-list" class="d-flex flex-column gap-2" style="max-height: 380px; overflow-y: auto; padding-right: 0.5rem;"></div>
+                    </div>
+
+                    <!-- Right: Mockup Preview with Scroll -->
+                    <div class="col-md-6">
+                        <h3 class="h6 fw-bold mb-3 text-heading uppercase"><i class="fa-solid fa-desktop me-2 text-success"></i>Live Preview</h3>
+                        <div class="preset-preview-window m-0" id="mock-browser-window" style="height: 380px; display: flex; flex-direction: column;">
+                            <div class="preset-preview-browser" style="border-bottom: 1px solid var(--sk-border); padding: 0.5rem 0.75rem;">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div id="mock-preview-container" class="p-3 flex-grow-1 d-flex flex-column justify-content-between" style="overflow-y: auto; transition: background-color 0.2s ease;">
+                                <!-- Navbar -->
+                                <div id="mock-navbar" class="d-flex justify-content-between align-items-center p-2 rounded mb-3" style="border: 1px solid transparent; font-size: 0.75rem;">
+                                    <strong id="mock-logo">BrandLogo</strong>
+                                    <div class="d-flex gap-2">
+                                        <span>Home</span>
+                                        <span>Features</span>
+                                    </div>
+                                </div>
+
+                                <!-- Hero -->
+                                <div class="text-center my-auto py-2">
+                                    <span id="mock-badge" class="badge mb-2" style="font-size: 0.65rem;">ACCENT BADGE</span>
+                                    <h4 id="mock-heading" class="fw-bold mb-2" style="font-size: 1.15rem;">Headline Text</h4>
+                                    <p id="mock-body" class="mb-3" style="font-size: 0.8rem; line-height: 1.4;">Realistic website preview using community palette colors.</p>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button id="mock-btn-primary" class="btn btn-sm px-3" style="font-size: 0.72rem; font-weight: 700; border: 0;">Primary Action</button>
+                                        <button id="mock-btn-secondary" class="btn btn-sm px-3" style="font-size: 0.72rem; font-weight: 600; border: 1px solid transparent;">Secondary Action</button>
+                                    </div>
+                                </div>
+
+                                <!-- Footer -->
+                                <div id="mock-footer" class="text-center pt-2 mt-3" style="border-top: 1px solid transparent; font-size: 0.65rem;">
+                                    <span id="mock-muted-text">Muted copyright footer text</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light" style="border-top: 1px solid var(--sk-border);">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                {% if request.user.is_authenticated %}
+                    <form method="post" action="" id="modal-apply-form" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-copy me-2"></i>Copy Community Palette
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i>Sign in to Copy
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // AJAX Like Toggling
+        const likeBtns = document.querySelectorAll(".btn-like");
+        likeBtns.forEach(btn => {
+            btn.addEventListener("click", function(e) {
+                e.preventDefault();
+                const slug = this.dataset.slug;
+                const heartIcon = this.querySelector("i");
+                const countSpan = this.querySelector(".like-count");
+                
+                // Get CSRF Token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                fetch(`/community/like/${slug}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.liked) {
+                        this.classList.add("liked");
+                        heartIcon.className = "fa-solid fa-heart";
+                    } else {
+                        this.classList.remove("liked");
+                        heartIcon.className = "fa-regular fa-heart";
+                    }
+                    countSpan.textContent = data.likes_count;
+                })
+                .catch(err => console.error("Error toggling like:", err));
+            });
+        });
+
+        // AJAX Views tracking & Modal population
+        const previewBtns = document.querySelectorAll(".preset-preview-btn");
+        const modalTitle = document.getElementById("presetPreviewModalLabel");
+        const modalCategory = document.getElementById("modal-preset-category");
+        const modalTheme = document.getElementById("modal-preset-theme");
+        const modalDescription = document.getElementById("modal-preset-description");
+        const modalColorsList = document.getElementById("modal-colors-list");
+        const modalApplyForm = document.getElementById("modal-apply-form");
+
+        // Mock browser elements
+        const mockPreviewContainer = document.getElementById("mock-preview-container");
+        const mockNavbar = document.getElementById("mock-navbar");
+        const mockLogo = document.getElementById("mock-logo");
+        const mockBadge = document.getElementById("mock-badge");
+        const mockHeading = document.getElementById("mock-heading");
+        const mockBody = document.getElementById("mock-body");
+        const mockBtnPrimary = document.getElementById("mock-btn-primary");
+        const mockBtnSecondary = document.getElementById("mock-btn-secondary");
+        const mockFooter = document.getElementById("mock-footer");
+        const mockMutedText = document.getElementById("mock-muted-text");
+
+        previewBtns.forEach(btn => {
+            btn.addEventListener("click", function() {
+                const name = this.dataset.name;
+                const description = this.dataset.description;
+                const category = this.dataset.category;
+                const theme = this.dataset.theme;
+                const applyUrl = this.dataset.applyUrl;
+                const slug = this.dataset.slug;
+                const colors = JSON.parse(this.dataset.colors);
+
+                // Track unique view
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                fetch(`/community/track-view/${slug}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    const viewsSpan = document.querySelector(`.view-count-text-${slug}`);
+                    if (viewsSpan) {
+                        viewsSpan.textContent = data.views_count;
+                    }
+                })
+                .catch(err => console.error("Error tracking view:", err));
+
+                // Populate modal info
+                modalTitle.textContent = name;
+                modalCategory.textContent = category;
+                modalTheme.textContent = theme;
+                modalDescription.textContent = description || "No description provided.";
+                
+                if (modalApplyForm) {
+                    modalApplyForm.action = applyUrl;
+                }
+
+                // Render list
+                modalColorsList.innerHTML = "";
+                let colorMap = {};
+                
+                colors.forEach(color => {
+                    colorMap[color.role] = color.hex;
+                    const item = document.createElement("div");
+                    item.className = "d-flex align-items-center justify-content-between p-2 rounded border bg-white";
+                    item.style.borderColor = "var(--sk-border)";
+                    item.innerHTML = `
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="display:inline-block; width:1.5rem; height:1.5rem; border-radius:0.4rem; border:1px solid rgba(0,0,0,0.1); background-color:${color.hex};"></span>
+                            <span class="small fw-bold text-heading">${color.role_display}</span>
+                        </div>
+                        <code>${color.hex}</code>
+                    `;
+                    modalColorsList.appendChild(item);
+                });
+
+                // Apply style properties
+                const primary = colorMap["PRIMARY"] || "#2563eb";
+                const secondary = colorMap["SECONDARY"] || "#64748b";
+                const accent = colorMap["ACCENT"] || "#f59e0b";
+                const bg = colorMap["BACKGROUND"] || "#f8fafc";
+                const surface = colorMap["SURFACE"] || "#ffffff";
+                const heading = colorMap["HEADING"] || "#0f172a";
+                const bodyText = colorMap["BODY_TEXT"] || "#334155";
+                const mutedText = colorMap["MUTED_TEXT"] || "#64748b";
+                const border = colorMap["BORDER"] || "#e2e8f0";
+
+                mockPreviewContainer.style.backgroundColor = bg;
+                mockNavbar.style.backgroundColor = surface;
+                mockNavbar.style.borderColor = border;
+                mockNavbar.style.color = bodyText;
+                mockLogo.style.color = primary;
+
+                mockBadge.style.backgroundColor = primary;
+                mockBadge.style.color = "#ffffff";
+                mockHeading.style.color = heading;
+                mockHeading.textContent = name;
+                mockBody.style.color = bodyText;
+
+                mockBtnPrimary.style.backgroundColor = primary;
+                mockBtnPrimary.style.color = "#ffffff";
+
+                mockBtnSecondary.style.backgroundColor = surface;
+                mockBtnSecondary.style.borderColor = border;
+                mockBtnSecondary.style.color = secondary;
+
+                mockFooter.style.borderTopColor = border;
+                mockMutedText.style.color = mutedText;
+            });
+        });
+    });
+</script>
+{% endblock %}

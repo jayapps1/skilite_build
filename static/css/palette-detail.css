@@ -58,6 +58,25 @@
 .detail-preview {
     background: var(--background);
     color: var(--body);
+    height: 600px;
+    overflow-y: auto;
+}
+
+.detail-preview::-webkit-scrollbar {
+    width: 6px;
+}
+
+.detail-preview::-webkit-scrollbar-track {
+    background: var(--surface);
+}
+
+.detail-preview::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.detail-preview::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
 }
 
 .detail-preview nav {

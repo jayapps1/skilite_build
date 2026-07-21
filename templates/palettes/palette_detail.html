@@ -1,8 +1,12 @@
-{% extends "base/base.html" %}
+{% extends extend_template|default:"base/base.html" %}
 {% load static %}
 
 {% block title %}
     {{ palette.name }} | Skilite Build
+{% endblock %}
+
+{% block dashboard_title %}
+    Palette Details
 {% endblock %}
 
 {% block extra_css %}
@@ -13,7 +17,7 @@
 {% endblock %}
 
 {% block content %}
-<section class="palette-detail-page py-5">
+<div class="py-2">
     <div class="container">
 
         <div class="detail-toolbar mb-4">
@@ -26,36 +30,69 @@
             </a>
 
             <div class="detail-actions">
-                <a
-                    href="{% url 'palettes:edit' palette.slug %}"
-                    class="btn btn-primary"
-                >
-                    <i class="fa-solid fa-pen me-2"></i>
-                    Edit
-                </a>
-
-                <form
-                    method="post"
-                    action="{% url 'palettes:duplicate' palette.slug %}"
-                >
-                    {% csrf_token %}
-
-                    <button
-                        type="submit"
-                        class="btn btn-outline-primary"
+                {% if request.user.is_authenticated and palette.owner == request.user %}
+                    <a
+                        href="{% url 'palettes:edit' palette.slug %}"
+                        class="btn btn-primary"
                     >
-                        <i class="fa-regular fa-copy me-2"></i>
-                        Duplicate
-                    </button>
-                </form>
+                        <i class="fa-solid fa-pen me-2"></i>
+                        Edit
+                    </a>
 
-                <a
-                    href="{% url 'palettes:delete' palette.slug %}"
-                    class="btn btn-outline-danger"
-                >
-                    <i class="fa-solid fa-trash me-2"></i>
-                    Delete
-                </a>
+                    <form
+                        method="post"
+                        action="{% url 'palettes:duplicate' palette.slug %}"
+                        class="d-inline"
+                    >
+                        {% csrf_token %}
+                        <button
+                            type="submit"
+                            class="btn btn-outline-primary"
+                        >
+                            <i class="fa-regular fa-copy me-2"></i>
+                            Duplicate
+                        </button>
+                    </form>
+
+                    <form
+                        method="post"
+                        action="{% url 'palettes:publish' palette.slug %}"
+                        class="d-inline"
+                    >
+                        {% csrf_token %}
+                        {% if palette.is_published %}
+                            <button type="submit" class="btn btn-outline-warning">
+                                <i class="fa-solid fa-eye-slash me-2"></i>
+                                Unpublish
+                            </button>
+                        {% else %}
+                            <button type="submit" class="btn btn-outline-success">
+                                <i class="fa-solid fa-share me-2"></i>
+                                Publish
+                            </button>
+                        {% endif %}
+                    </form>
+
+                    <a
+                        href="{% url 'palettes:delete' palette.slug %}"
+                        class="btn btn-outline-danger"
+                    >
+                        <i class="fa-solid fa-trash me-2"></i>
+                        Delete
+                    </a>
+                {% elif request.user.is_authenticated %}
+                    <form
+                        method="post"
+                        action="{% url 'community:copy' palette.slug %}"
+                        class="d-inline"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-copy me-2"></i>
+                            Copy to My Palettes
+                        </button>
+                    </form>
+                {% endif %}
             </div>
         </div>
 
@@ -281,5 +318,5 @@
         </div>
 
     </div>
-</section>
+</div>
 {% endblock %}

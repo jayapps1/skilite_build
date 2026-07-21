@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, UserProfile
+from .models import User, UserProfile, UserActivityLog
 
 
 class UserProfileInline(admin.StackedInline):
@@ -73,4 +73,25 @@ class UserProfileAdmin(admin.ModelAdmin):
     autocomplete_fields = (
         "user",
         "preferred_language",
+    )
+
+
+@admin.register(UserActivityLog)
+class UserActivityLogAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "action",
+        "details",
+        "ip_address",
+        "created_at",
+    )
+    list_filter = (
+        "action",
+        "created_at",
+    )
+    search_fields = (
+        "user__username",
+        "user__email",
+        "action",
+        "details",
     )

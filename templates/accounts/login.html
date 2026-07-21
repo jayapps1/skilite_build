@@ -1,0 +1,78 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}
+    Skilite Build | Login
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <a class="skilite-brand mb-3" href="{% url 'core:home' %}">
+                <span class="brand-symbol">
+                    <i class="fa-solid fa-palette"></i>
+                </span>
+                <span class="brand-name">
+                    Skilite <strong>Build</strong>
+                </span>
+            </a>
+            <h1>Welcome Back</h1>
+            <p>Access your professional colour workspace</p>
+        </div>
+
+        <form method="post" action="{% url 'accounts:login' %}" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="form-group-custom">
+                <label for="{{ form.username.id_for_label }}">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <ul class="form-errors">
+                        {% for error in form.username.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group-custom">
+                <label for="{{ form.password.id_for_label }}">Password</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <ul class="form-errors">
+                        {% for error in form.password.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-3 mt-2">
+                <i class="fa-solid fa-arrow-right-to-bracket me-2"></i>Sign In
+            </button>
+        </form>
+
+        <hr class="my-4 text-muted">
+
+        <div class="text-center">
+            <span class="text-muted small">New to Skilite Build?</span>
+            <a href="{% url 'accounts:register' %}" class="btn btn-link text-decoration-none p-0 ms-1 fw-bold">
+                Create an account
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

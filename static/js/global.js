@@ -68,4 +68,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 alertInstance.close();
             });
     }, 6000);
+
+    // Night Mode (Dark/Light Theme) Toggler
+    const themeToggleBtn = document.querySelector("#theme-toggle-btn");
+    const themeToggleIcon = document.querySelector("#theme-toggle-icon");
+
+    if (themeToggleBtn && themeToggleIcon) {
+        const updateToggleIcon = (theme) => {
+            if (theme === "dark") {
+                themeToggleIcon.classList.remove("fa-moon");
+                themeToggleIcon.classList.add("fa-sun");
+            } else {
+                themeToggleIcon.classList.remove("fa-sun");
+                themeToggleIcon.classList.add("fa-moon");
+            }
+        };
+
+        const currentTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
+        updateToggleIcon(currentTheme);
+
+        themeToggleBtn.addEventListener("click", () => {
+            const activeTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
+            const newTheme = activeTheme === "dark" ? "light" : "dark";
+
+            document.documentElement.setAttribute("data-bs-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+            updateToggleIcon(newTheme);
+        });
+    }
 });

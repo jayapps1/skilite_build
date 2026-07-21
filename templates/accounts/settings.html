@@ -1,0 +1,271 @@
+{% extends "base/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Settings | Skilite Build
+{% endblock %}
+
+{% block dashboard_title %}
+    Settings
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="py-2">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="section-card">
+                <div class="section-card-title">
+                    <h3><i class="fa-solid fa-user-gear me-2 text-primary"></i>Account Settings</h3>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <nav class="settings-nav">
+                    <button class="settings-tab-btn active" data-target="profile-pane">
+                        <i class="fa-regular fa-user me-2"></i>Profile Information
+                    </button>
+                    <button class="settings-tab-btn" data-target="account-pane">
+                        <i class="fa-solid fa-shield-halved me-2"></i>Account Details
+                    </button>
+                </nav>
+
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    {% if user_form.non_field_errors or profile_form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for error in user_form.non_field_errors %}
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                    <span>{{ error }}</span>
+                                </div>
+                            {% endfor %}
+                            {% for error in profile_form.non_field_errors %}
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                    <span>{{ error }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Profile Information Pane -->
+                    <div id="profile-pane" class="settings-pane active">
+                        <h4 class="h5 mb-4 fw-bold text-heading">Public Profile Info</h4>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="profile-avatar-wrapper mt-2">
+                                    <div class="profile-avatar-large">
+                                        {% if request.user.profile.profile_image %}
+                                            <img src="{{ request.user.profile.profile_image.url }}" alt="{{ request.user.profile.display_name }}">
+                                        {% else %}
+                                            {{ request.user.username|first|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-center">
+                                        <span class="small text-muted">Upload profile image</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group-custom">
+                                    <label for="{{ profile_form.profile_image.id_for_label }}">Avatar Image</label>
+                                    {{ profile_form.profile_image }}
+                                    {% if profile_form.profile_image.errors %}
+                                        <ul class="form-errors">
+                                            {% for error in profile_form.profile_image.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group-custom">
+                            <label for="{{ profile_form.display_name.id_for_label }}">Display Name</label>
+                            {{ profile_form.display_name }}
+                            {% if profile_form.display_name.errors %}
+                                <ul class="form-errors">
+                                    {% for error in profile_form.display_name.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group-custom">
+                            <label for="{{ profile_form.bio.id_for_label }}">Bio</label>
+                            {{ profile_form.bio }}
+                            {% if profile_form.bio.errors %}
+                                <ul class="form-errors">
+                                    {% for error in profile_form.bio.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="{{ profile_form.company_name.id_for_label }}">Company Name</label>
+                                    {{ profile_form.company_name }}
+                                    {% if profile_form.company_name.errors %}
+                                        <ul class="form-errors">
+                                            {% for error in profile_form.company_name.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="{{ profile_form.website_url.id_for_label }}">Website URL</label>
+                                    {{ profile_form.website_url }}
+                                    {% if profile_form.website_url.errors %}
+                                        <ul class="form-errors">
+                                            {% for error in profile_form.website_url.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="h5 mt-4 mb-4 fw-bold text-heading border-top pt-4">Theme & Language Preference</h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="{{ profile_form.preferred_language.id_for_label }}">Preferred Language</label>
+                                    {{ profile_form.preferred_language }}
+                                    {% if profile_form.preferred_language.errors %}
+                                        <ul class="form-errors">
+                                            {% for error in profile_form.preferred_language.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="{{ profile_form.preferred_theme.id_for_label }}">Preferred Theme</label>
+                                    {{ profile_form.preferred_theme }}
+                                    {% if profile_form.preferred_theme.errors %}
+                                        <ul class="form-errors">
+                                            {% for error in profile_form.preferred_theme.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Details Pane -->
+                    <div id="account-pane" class="settings-pane">
+                        <h4 class="h5 mb-4 fw-bold text-heading">Security and Auth Settings</h4>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="{{ user_form.username.id_for_label }}">Username</label>
+                                    {{ user_form.username }}
+                                    {% if user_form.username.errors %}
+                                        <ul class="form-errors">
+                                            {% for error in user_form.username.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="{{ user_form.email.id_for_label }}">Email Address</label>
+                                    {{ user_form.email }}
+                                    {% if user_form.email.errors %}
+                                        <ul class="form-errors">
+                                            {% for error in user_form.email.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="{{ user_form.first_name.id_for_label }}">First Name</label>
+                                    {{ user_form.first_name }}
+                                    {% if user_form.first_name.errors %}
+                                        <ul class="form-errors">
+                                            {% for error in user_form.first_name.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="{{ user_form.last_name.id_for_label }}">Last Name</label>
+                                    {{ user_form.last_name }}
+                                    {% if user_form.last_name.errors %}
+                                        <ul class="form-errors">
+                                            {% for error in user_form.last_name.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 mt-4">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Save Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabBtns = document.querySelectorAll('.settings-tab-btn');
+        const panes = document.querySelectorAll('.settings-pane');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active classes
+                tabBtns.forEach(b => b.classList.remove('active'));
+                panes.forEach(p => p.classList.remove('active'));
+
+                // Add active classes to targets
+                this.classList.add('active');
+                const targetPane = document.getElementById(this.dataset.target);
+                if (targetPane) {
+                    targetPane.classList.add('active');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

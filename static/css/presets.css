@@ -339,3 +339,62 @@
         min-height: 42px;
     }
 }
+
+/* Night Mode Overrides for Presets */
+[data-bs-theme="dark"] .preset-page {
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(37, 99, 235, 0.1),
+            transparent 30rem
+        ),
+        var(--sk-background);
+}
+
+[data-bs-theme="dark"] .preset-filter-panel,
+[data-bs-theme="dark"] .preset-card {
+    background-color: var(--sk-surface);
+    border-color: var(--sk-border);
+    box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.25);
+}
+
+[data-bs-theme="dark"] .preset-card:hover {
+    border-color: rgba(37, 99, 235, 0.5);
+    box-shadow: 0 1.3rem 3rem rgba(0, 0, 0, 0.35);
+}
+
+[data-bs-theme="dark"] .preset-preview-window {
+    background-color: var(--sk-surface);
+    border-color: var(--sk-border);
+}
+
+[data-bs-theme="dark"] .preset-role-item {
+    background-color: #1f2937;
+    border-color: #374151;
+}
+
+[data-bs-theme="dark"] .preset-card-footer {
+    background-color: #1f2937;
+    border-color: #374151;
+}
+
+[data-bs-theme="dark"] .modal-content {
+    background-color: var(--sk-surface);
+    border-color: var(--sk-border);
+}
+
+[data-bs-theme="dark"] .modal-header {
+    background-color: #1f2937 !important;
+    border-bottom-color: var(--sk-border) !important;
+}
+
+[data-bs-theme="dark"] .modal-footer {
+    background-color: #1f2937 !important;
+    border-top-color: var(--sk-border) !important;
+}
+
+[data-bs-theme="dark"] #modal-colors-list .bg-white {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+}
+

@@ -101,3 +101,50 @@ class UserProfile(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.display_name or self.user.username
+
+
+class UserActivityLog(TimeStampedModel):
+    """
+    Log of actions taken by a user for auditing and activity tracking.
+    """
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="activity_logs",
+    )
+    action = models.CharField(max_length=255)
+    details = models.TextField(blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    is_priority = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "user_activity_logs"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.user.username} - {self.action} at {self.created_at}"
+
+
+def log_user_activity(request, user, action, details="", is_priority=False):
+    """
+    Utility helper to log user audit actions.
+    """
+    if not user or not user.is_authenticated:
+        return None
+
+    ip = None
+    if request:
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(",")[0].strip()
+        else:
+            ip = request.META.get("REMOTE_ADDR")
+
+    return UserActivityLog.objects.create(
+        user=user,
+        action=action,
+        details=details,
+        ip_address=ip,
+        is_priority=is_priority,
+    )

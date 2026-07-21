@@ -9,6 +9,7 @@ from .views import (
     PaletteDuplicateView,
     PaletteUpdateView,
     PresetPaletteListView,
+    PalettePublishView,
 )
 
 
@@ -50,6 +51,11 @@ urlpatterns = [
         "<slug:slug>/delete/",
         PaletteDeleteView.as_view(),
         name="delete",
+    ),
+    path(
+        "<slug:slug>/publish/",
+        PalettePublishView.as_view(),
+        name="publish",
     ),
     path(
         "<slug:slug>/",
