@@ -1,0 +1,76 @@
+<div id="preview-section-profile" class="preview-section d-none p-4 py-5" style="background: var(--preview-background);">
+    <!-- Cover Image Block -->
+    <div class="preview-profile-cover-wrapper rounded overflow-hidden mb-4 position-relative shadow-sm" style="height: 180px; border: 1px solid var(--preview-border);">
+        <img class="preview-profile-cover w-100 h-100" data-type="cover" alt="Business Widescreen Cover Banner" style="object-fit: cover;">
+        <!-- Floating Logo/Avatar overlay -->
+        <div class="position-absolute" style="bottom: 12px; left: 24px; z-index: 10;">
+            <div class="preview-profile-avatar-wrapper rounded-circle border border-3 border-white overflow-hidden shadow-md" style="width: 76px; height: 76px; background-color: var(--preview-primary); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem;" id="preview-profile-avatar">
+                CO
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Spacer to adjust for floating avatar -->
+    <div style="height: 12px;"></div>
+
+    <div class="row g-4 text-start">
+        <div class="col-md-5">
+            <div class="p-4 rounded preview-card-element text-center h-100 mt-1 border shadow-sm" style="border-color: var(--preview-border) !important;">
+                <h4 class="h5 fw-bold mb-1 preview-text-heading" id="preview-profile-name">Company Name</h4>
+                <span class="badge text-bg-light mb-3 text-uppercase font-monospace" style="font-size: 0.65rem; border: 1px solid var(--preview-border);" id="preview-profile-category-badge">
+                    <i class="fa-solid fa-circle-check text-success me-1"></i>Verified Brand
+                </span>
+                
+                <div class="pt-3 border-top d-flex flex-column gap-2.5 text-start" style="font-size: 0.8rem; border-color: var(--preview-border) !important;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-globe text-muted" style="width: 16px;"></i>
+                        <span class="preview-text-body">www.business.com</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-muted" style="width: 16px;"></i>
+                        <span class="preview-text-body" id="preview-profile-loc">Accra, Ghana</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-clock text-muted" style="width: 16px;"></i>
+                        <span class="preview-text-body">Active Status: <span class="text-success fw-bold">Open</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="p-4 rounded preview-card-element h-100 text-start mt-1 border shadow-sm" style="border-color: var(--preview-border) !important;">
+                <h4 class="h6 fw-bold mb-3 preview-text-heading"><i class="fa-solid fa-certificate me-2 text-warning"></i>Certifications & Verifications</h4>
+                <div class="d-flex flex-column gap-2 mb-4" style="font-size: 0.78rem;">
+                    <div class="p-2.5 rounded d-flex justify-content-between align-items-center" style="background: rgba(0,0,0,0.03);">
+                        <span class="preview-text-body fw-semibold" id="preview-cert-label-1">ISO 9001 Quality Standard</span>
+                        <span class="badge bg-success text-white px-2 py-0.5">Verified</span>
+                    </div>
+                    <div class="p-2.5 rounded d-flex justify-content-between align-items-center" style="background: rgba(0,0,0,0.03);">
+                        <span class="preview-text-body fw-semibold" id="preview-cert-label-2">Accredited Operations</span>
+                        <span class="badge bg-success text-white px-2 py-0.5">Active</span>
+                    </div>
+                </div>
+
+                <h4 class="h6 fw-bold mb-3 preview-text-heading"><i class="fa-solid fa-images me-2 text-info"></i>Recent Visual Projects</h4>
+                <div class="row g-2">
+                    <div class="col-4">
+                        <div class="preview-work-image-wrapper rounded overflow-hidden shadow-sm" style="height: 70px; border: 1px solid var(--preview-border);">
+                            <img class="preview-work-img w-100 h-100" data-type="gallery" data-index="0" alt="Recent Project 1" style="object-fit: cover;">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="preview-work-image-wrapper rounded overflow-hidden shadow-sm" style="height: 70px; border: 1px solid var(--preview-border);">
+                            <img class="preview-work-img w-100 h-100" data-type="gallery" data-index="1" alt="Recent Project 2" style="object-fit: cover;">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="preview-work-image-wrapper rounded overflow-hidden shadow-sm" style="height: 70px; border: 1px solid var(--preview-border);">
+                            <img class="preview-work-img w-100 h-100" data-type="gallery" data-index="2" alt="Recent Project 3" style="object-fit: cover;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

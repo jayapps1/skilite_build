@@ -1,0 +1,56 @@
+<!-- Preview Container Shell -->
+<div class="preview-container-shell" style="{% if request.GET.hide_chrome %}border: 0; border-radius: 0; box-shadow: none; margin: 0;{% endif %}">
+    {% if not request.GET.hide_chrome %}
+    <!-- Resizer controls Toolbar -->
+    <div class="preview-resizer-toolbar" id="preview-resizer-toolbar">
+        <div class="resizer-buttons">
+            <button type="button" class="btn btn-sm btn-outline-secondary resizer-btn active" data-device="desktop" title="Desktop width (1200px)" aria-label="Desktop preview mode">
+                <i class="fa-solid fa-desktop"></i> Desktop
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary resizer-btn" data-device="tablet" title="Tablet width (768px)" aria-label="Tablet preview mode">
+                <i class="fa-solid fa-tablet-button"></i> Tablet
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary resizer-btn" data-device="mobile" title="Mobile width (390px)" aria-label="Mobile preview mode">
+                <i class="fa-solid fa-mobile-button"></i> Mobile
+            </button>
+        </div>
+
+        <div class="resizer-actions">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="preview-action-fullscreen" title="Fullscreen mode" aria-label="Toggle fullscreen mode">
+                <i class="fa-solid fa-expand"></i> Fullscreen
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="preview-action-refresh" title="Refresh values" aria-label="Refresh preview values">
+                <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="preview-action-reset" title="Reset page to Home" aria-label="Reset page to Home">
+                <i class="fa-solid fa-house"></i> Reset
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Frame Wrapper -->
+    <div class="preview-frame-wrapper" id="preview-frame-wrapper" style="{% if request.GET.hide_chrome %}padding: 0; min-height: auto; background: transparent;{% endif %}">
+        <div class="live-business-preview device-desktop" id="live-business-preview" style="{% if request.GET.hide_chrome %}border: 0; border-radius: 0; box-shadow: none; height: auto;{% endif %}">
+            {% include "palettes/components/preview/preview_navbar.html" %}
+            
+            <div class="business-preview-main-content">
+                {% include "palettes/components/preview/preview_home.html" %}
+                {% include "palettes/components/preview/preview_about.html" %}
+                {% include "palettes/components/preview/preview_features.html" %}
+                {% include "palettes/components/preview/preview_contact.html" %}
+                {% include "palettes/components/preview/preview_profile.html" %}
+            </div>
+
+            <!-- Status Alerts Block -->
+            <section class="preview-status-section p-3">
+                <span class="preview-status success-status"><i class="fa-solid fa-check me-1"></i>Success</span>
+                <span class="preview-status warning-status"><i class="fa-solid fa-triangle-exclamation me-1"></i>Warning</span>
+                <span class="preview-status danger-status"><i class="fa-solid fa-circle-xmark me-1"></i>Danger</span>
+                <span class="preview-status info-status"><i class="fa-solid fa-info me-1"></i>Information</span>
+            </section>
+
+            {% include "palettes/components/preview/preview_footer.html" %}
+        </div>
+    </div>
+</div>

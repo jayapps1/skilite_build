@@ -13,14 +13,14 @@ from apps.core.models import TimeStampedModel
 
 class PaletteLike(TimeStampedModel):
     """
-    Records a like given by a registered user to a palette.
-
-    A user can like a particular palette only once.
+    Records a like given by a registered or anonymous user to a palette.
     """
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         related_name="palette_likes",
     )
 
@@ -30,6 +30,16 @@ class PaletteLike(TimeStampedModel):
         related_name="likes",
     )
 
+    session_key = models.CharField(
+        max_length=255,
+        blank=True,
+    )
+
+    ip_hash = models.CharField(
+        max_length=64,
+        blank=True,
+    )
+
     class Meta:
         db_table = "palette_likes"
         ordering = ["-created_at"]
@@ -37,7 +47,13 @@ class PaletteLike(TimeStampedModel):
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "palette"],
-                name="unique_user_palette_like",
+                condition=models.Q(user__isnull=False),
+                name="unique_user_palette_like_new",
+            ),
+            models.UniqueConstraint(
+                fields=["session_key", "palette"],
+                condition=models.Q(user__isnull=True) & ~models.Q(session_key=""),
+                name="unique_session_palette_like",
             ),
         ]
 
@@ -50,10 +66,33 @@ class PaletteLike(TimeStampedModel):
                 fields=["user", "-created_at"],
                 name="palette_like_user_idx",
             ),
+            models.Index(
+                fields=["session_key", "-created_at"],
+                name="palette_like_session_idx",
+            ),
         ]
 
     def __str__(self):
-        return f"{self.user.username} likes {self.palette.name}"
+        viewer = self.user.username if self.user else f"Guest ({self.ip_hash[:8]})"
+        return f"{viewer} likes {self.palette.name}"
+
+    def clean(self):
+        super().clean()
+        self.session_key = self.session_key.strip()
+        if not self.user_id and not self.session_key:
+            raise ValidationError(
+                {
+                    "session_key": (
+                        "A guest palette like requires "
+                        "a browser session key."
+                    )
+                }
+            )
+
+    def save(self, *args, **kwargs):
+        self.session_key = self.session_key.strip()
+        self.full_clean()
+        return super().save(*args, **kwargs)
 
 
 class PaletteCopyQuerySet(models.QuerySet):

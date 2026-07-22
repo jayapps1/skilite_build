@@ -25,6 +25,8 @@
             <p>Access your professional colour workspace</p>
         </div>
 
+        {% include "components/messages.html" %}
+
         <form method="post" action="{% url 'accounts:login' %}" novalidate>
             {% csrf_token %}
 
@@ -49,7 +51,10 @@
             </div>
 
             <div class="form-group-custom">
-                <label for="{{ form.password.id_for_label }}">Password</label>
+                <div class="d-flex justify-content-between align-items-center">
+                    <label for="{{ form.password.id_for_label }}">Password</label>
+                    <a href="{% url 'accounts:forgot_password' %}" class="small text-decoration-none fw-bold text-primary">Forgot password?</a>
+                </div>
                 {{ form.password }}
                 {% if form.password.errors %}
                     <ul class="form-errors">

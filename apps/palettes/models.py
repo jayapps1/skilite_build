@@ -161,6 +161,11 @@ class Palette(TimeStampedModel):
         blank=True,
     )
 
+    deleted_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
     objects = PaletteQuerySet.as_manager()
 
     class Meta:

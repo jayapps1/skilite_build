@@ -1016,3 +1016,94 @@ class PalettePublishView(LoginRequiredMixin, View):
         if not next_url:
             next_url = reverse("palettes:edit", kwargs={"slug": palette.slug})
         return redirect(next_url)
+
+
+class RecycleBinView(LoginRequiredMixin, ListView):
+    """
+    Lists all soft-deleted palettes in the recycle bin for the current user.
+    """
+
+    model = Palette
+    template_name = "palettes/recycle_bin.html"
+    context_object_name = "palettes"
+
+    def get_queryset(self):
+        return Palette.objects.filter(
+            owner=self.request.user,
+            is_active=False,
+            deleted_at__isnull=False,
+        ).order_by("-deleted_at")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["extend_template"] = "base/base_dashboard.html"
+        # Calculate days remaining for each palette
+        for palette in context["palettes"]:
+            if palette.deleted_at:
+                elapsed = timezone.now() - palette.deleted_at
+                days_left = max(0, 30 - elapsed.days)
+                palette.days_remaining = days_left
+            else:
+                palette.days_remaining = 30
+        return context
+
+
+class RestorePaletteView(LoginRequiredMixin, View):
+    """
+    Restores a soft-deleted palette back to the user's library.
+    """
+
+    def post(self, request, *args, **kwargs):
+        slug = kwargs.get("slug")
+        palette = get_object_or_404(
+            Palette,
+            slug=slug,
+            owner=request.user,
+            is_active=False,
+        )
+
+        PaletteLifecycleService.restore(palette=palette)
+
+        log_user_activity(
+            request,
+            request.user,
+            "Restored Palette",
+            f"Restored palette '{palette.name}' from the recycle bin",
+        )
+
+        messages.success(
+            request,
+            f"'{palette.name}' has been successfully restored to your library.",
+        )
+        return redirect("palettes:my_palettes")
+
+
+class PermanentDeletePaletteView(LoginRequiredMixin, View):
+    """
+    Permanently deletes a palette from the database.
+    """
+
+    def post(self, request, *args, **kwargs):
+        slug = kwargs.get("slug")
+        palette = get_object_or_404(
+            Palette,
+            slug=slug,
+            owner=request.user,
+            is_active=False,
+        )
+
+        palette.delete()
+
+        log_user_activity(
+            request,
+            request.user,
+            "Permanently Deleted Palette",
+            f"Permanently removed palette '{palette.name}'",
+            is_priority=True,
+        )
+
+        messages.success(
+            request,
+            f"'{palette.name}' has been permanently deleted.",
+        )
+        return redirect("palettes:recycle_bin")

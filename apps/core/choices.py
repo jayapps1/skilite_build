@@ -87,3 +87,23 @@ class TranslationStatus(models.TextChoices):
     PROCESSING = "PROCESSING", "Processing"
     COMPLETED = "COMPLETED", "Completed"
     FAILED = "FAILED", "Failed"
+
+
+class EnquiryType(models.TextChoices):
+    GENERAL = "GENERAL", "General Enquiry"
+    TECHNICAL_SUPPORT = "TECHNICAL_SUPPORT", "Technical Support"
+    ACCOUNT_SUPPORT = "ACCOUNT_SUPPORT", "Account Support"
+    PALETTE_SUPPORT = "PALETTE_SUPPORT", "Palette Support"
+    EXPORT_SUPPORT = "EXPORT_SUPPORT", "Export Support"
+    BUSINESS_ENQUIRY = "BUSINESS_ENQUIRY", "Business Enquiry"
+    FEEDBACK = "FEEDBACK", "Feedback"
+    PARTNERSHIP = "PARTNERSHIP", "Partnership"
+    OTHER = "OTHER", "Other"
+
+
+class EnquiryStatus(models.TextChoices):
+    NEW = "NEW", "New"
+    IN_PROGRESS = "IN_PROGRESS", "In Progress"
+    RESOLVED = "RESOLVED", "Resolved"
+    CLOSED = "CLOSED", "Closed"
+    SPAM = "SPAM", "Spam"

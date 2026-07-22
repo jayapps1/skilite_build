@@ -14,6 +14,10 @@
     rel="stylesheet"
     href="{% static 'css/palette-detail.css' %}"
 >
+<link
+    rel="stylesheet"
+    href="{% static 'css/palette-preview-site.css' %}"
+>
 {% endblock %}
 
 {% block content %}
@@ -131,83 +135,7 @@
         <div class="detail-layout">
 
             <div class="palette-preview-panel">
-                <div
-                    class="detail-preview"
-                    style="
-                        --primary: {{ preview_colors.PRIMARY }};
-                        --secondary: {{ preview_colors.SECONDARY }};
-                        --accent: {{ preview_colors.ACCENT }};
-                        --background: {{ preview_colors.BACKGROUND }};
-                        --surface: {{ preview_colors.SURFACE }};
-                        --heading: {{ preview_colors.HEADING }};
-                        --body: {{ preview_colors.BODY_TEXT }};
-                        --muted: {{ preview_colors.MUTED_TEXT }};
-                        --border: {{ preview_colors.BORDER }};
-                        --success: {{ preview_colors.SUCCESS }};
-                        --warning: {{ preview_colors.WARNING }};
-                        --danger: {{ preview_colors.DANGER }};
-                        --info: {{ preview_colors.INFO }};
-                    "
-                >
-                    <nav>
-                        <strong>Your Business</strong>
-
-                        <div>
-                            <span>Home</span>
-                            <span>Services</span>
-                            <span>Contact</span>
-                        </div>
-                    </nav>
-
-                    <section class="detail-preview-hero">
-                        <span class="preview-kicker">
-                            Professional business solution
-                        </span>
-
-                        <h2>
-                            Build a stronger digital presence
-                        </h2>
-
-                        <p>
-                            Previewing your saved semantic colour
-                            system on a realistic website layout.
-                        </p>
-
-                        <button type="button">
-                            Get started
-                        </button>
-                    </section>
-
-                    <section class="detail-preview-cards">
-                        <article>
-                            <h3>Professional</h3>
-                            <p>
-                                A complete website-ready colour system.
-                            </p>
-                        </article>
-
-                        <article>
-                            <h3>Editable</h3>
-                            <p>
-                                Continue refining every semantic role.
-                            </p>
-                        </article>
-
-                        <article>
-                            <h3>Exportable</h3>
-                            <p>
-                                Prepare the palette for development.
-                            </p>
-                        </article>
-                    </section>
-
-                    <section class="detail-statuses">
-                        <span class="status-success">Success</span>
-                        <span class="status-warning">Warning</span>
-                        <span class="status-danger">Danger</span>
-                        <span class="status-info">Information</span>
-                    </section>
-                </div>
+                {% include "palettes/components/preview/preview_shell.html" %}
             </div>
 
             <aside class="palette-information-panel">
@@ -319,4 +247,42 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/palette-preview-content.js' %}"></script>
+<script src="{% static 'js/palette-preview-site.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Populate static detail colors
+        const colorMap = {
+            PRIMARY: "{{ preview_colors.PRIMARY }}",
+            SECONDARY: "{{ preview_colors.SECONDARY }}",
+            ACCENT: "{{ preview_colors.ACCENT }}",
+            BACKGROUND: "{{ preview_colors.BACKGROUND }}",
+            SURFACE: "{{ preview_colors.SURFACE }}",
+            HEADING: "{{ preview_colors.HEADING }}",
+            BODY_TEXT: "{{ preview_colors.BODY_TEXT }}",
+            MUTED_TEXT: "{{ preview_colors.MUTED_TEXT }}",
+            BORDER: "{{ preview_colors.BORDER }}",
+            SUCCESS: "{{ preview_colors.SUCCESS }}",
+            WARNING: "{{ preview_colors.WARNING }}",
+            DANGER: "{{ preview_colors.DANGER }}",
+            INFO: "{{ preview_colors.INFO }}"
+        };
+        const category = "{{ palette.business_category.slug|default:'default' }}";
+        const theme = "{{ palette.theme_mode }}";
+
+        // Set attributes on preview element for fallback tracking
+        const previewEl = document.getElementById("live-business-preview");
+        if (previewEl) {
+            previewEl.dataset.category = category;
+            previewEl.dataset.theme = theme;
+        }
+
+        window.SkilitePreview.setColors(colorMap);
+        window.SkilitePreview.setCategory(category);
+        window.SkilitePreview.setTheme(theme);
+    });
+</script>
 {% endblock %}

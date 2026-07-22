@@ -1,0 +1,160 @@
+{% extends "base/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Recycle Bin | Skilite Build
+{% endblock %}
+
+{% block dashboard_title %}
+    Recycle Bin
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/my-palettes.css' %}">
+    <style>
+        .recycle-days-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.35rem 0.6rem;
+            border-radius: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .recycle-days-danger {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+        .recycle-days-warning {
+            background-color: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fcd34d;
+        }
+        .recycle-days-safe {
+            background-color: #ecfdf5;
+            color: #059669;
+            border: 1px solid #6ee7b7;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="py-2">
+
+    <div class="page-heading">
+        <div>
+            <span class="page-badge bg-danger text-white">
+                Recycle Bin
+            </span>
+            <h1 class="display-6 fw-bold mt-2 mb-2">
+                Recycle Bin
+            </h1>
+            <p class="text-secondary mb-0">
+                Deleted palettes stay in the recycle bin for 30 days before being permanently deleted.
+            </p>
+        </div>
+        <div class="heading-actions">
+            <a href="{% url 'palettes:my_palettes' %}" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-2"></i>
+                Back to My Palettes
+            </a>
+        </div>
+    </div>
+
+    {% if palettes %}
+        <div class="palette-card-grid mt-4">
+            {% for palette in palettes %}
+                <article class="palette-card">
+                    <div class="palette-colour-strip d-flex" style="height: 12px;">
+                        {% for color in palette.colors.all %}
+                            <span style="background-color: {{ color.hex_value }}; flex: 1;" title="{{ color.get_role_display }}: {{ color.hex_value }}"></span>
+                        {% empty %}
+                            <span style="background-color: #ccc; flex: 1;"></span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="palette-card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h2 class="h5 mb-0 fw-bold">
+                                {{ palette.name }}
+                            </h2>
+                            <div>
+                                {% if palette.days_remaining <= 5 %}
+                                    <span class="recycle-days-badge recycle-days-danger">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                        {{ palette.days_remaining }} days left
+                                    </span>
+                                {% elif palette.days_remaining <= 15 %}
+                                    <span class="recycle-days-badge recycle-days-warning">
+                                        <i class="fa-solid fa-clock"></i>
+                                        {{ palette.days_remaining }} days left
+                                    </span>
+                                {% else %}
+                                    <span class="recycle-days-badge recycle-days-safe">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                        {{ palette.days_remaining }} days left
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <p class="palette-category text-muted small mb-3">
+                            {% if palette.business_category %}
+                                <i class="{{ palette.business_category.icon }} me-1"></i>
+                                {{ palette.business_category.name }}
+                            {% else %}
+                                <i class="fa-solid fa-palette me-1"></i>
+                                General business
+                            {% endif %}
+                            &bull; {{ palette.get_theme_mode_display }}
+                        </p>
+
+                        {% if palette.description %}
+                            <p class="small text-secondary mb-4 text-truncate" style="max-width: 100%;">
+                                {{ palette.description }}
+                            </p>
+                        {% else %}
+                            <p class="small text-muted mb-4 italic">
+                                No description provided.
+                            </p>
+                        {% endif %}
+
+                        <div class="d-flex gap-2">
+                            <!-- Restore form -->
+                            <form method="post" action="{% url 'palettes:restore' palette.slug %}" class="flex-grow-1">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-success w-100 py-2">
+                                    <i class="fa-solid fa-rotate-left me-1"></i> Restore
+                                </button>
+                            </form>
+
+                            <!-- Permanent delete form -->
+                            <form method="post" action="{% url 'palettes:permanent_delete' palette.slug %}" class="flex-grow-1" onsubmit="return confirm('Are you sure you want to permanently delete this palette? This action cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger w-100 py-2">
+                                    <i class="fa-solid fa-trash-can me-1"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5 my-5">
+            <div class="display-1 text-muted mb-4">
+                <i class="fa-solid fa-trash-arrow-up"></i>
+            </div>
+            <h3>Recycle Bin is Empty</h3>
+            <p class="text-secondary max-width-md mx-auto">
+                Any palettes you delete will stay here for 30 days, allowing you to restore them if needed.
+            </p>
+            <a href="{% url 'palettes:my_palettes' %}" class="btn btn-primary mt-3">
+                Go to My Palettes
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,399 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}
+    About Skilite Build | Helping Businesses Build Better Website Colours
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="site-main">
+
+    <!-- 1. HERO SECTION -->
+    <section class="about-hero">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="about-badge">
+                        <i class="fa-solid fa-circle-info"></i>
+                        About Skilite Build
+                    </span>
+                    <h1>Helping businesses build complete, usable website <span>colour systems</span>.</h1>
+                    <p class="lead text-secondary mb-4">
+                        Skilite Build goes beyond producing a simple row of attractive colors. We map your selections to real-world semantic roles, giving you a functional system where every color serves a defined purpose.
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{% url 'palettes:editor' %}" class="btn btn-primary btn-lg px-4">
+                            <i class="fa-solid fa-palette me-2"></i>Palette Editor
+                        </a>
+                        <a href="{% url 'recommendations:index' %}" class="btn btn-outline-primary btn-lg px-4">
+                            <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Recommendations
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="about-hero-visual shadow-lg">
+                        <div class="about-hero-browser">
+                            <div class="about-hero-dots">
+                                <span class="bg-danger"></span>
+                                <span class="bg-warning"></span>
+                                <span class="bg-success"></span>
+                            </div>
+                            <span class="text-muted small mx-auto">skilitebuild.com/preview</span>
+                        </div>
+                        <div class="p-4 bg-light" style="min-height: 250px;">
+                            <div class="border rounded p-3 bg-white shadow-sm mb-3">
+                                <h4 class="h6 fw-bold text-primary mb-1"><i class="fa-solid fa-layer-group me-2"></i>Semantic Layout Mapping</h4>
+                                <p class="small text-muted mb-0">Colors adapt automatically based on category selections and contrast compliance constraints.</p>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <div class="p-2 border rounded bg-white text-center">
+                                        <div class="mx-auto rounded-circle mb-2" style="width: 24px; height: 24px; background: var(--sk-primary);"></div>
+                                        <span class="small fw-bold d-block">Primary</span>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="p-2 border rounded bg-white text-center">
+                                        <div class="mx-auto rounded-circle mb-2" style="width: 24px; height: 24px; background: var(--sk-accent);"></div>
+                                        <span class="small fw-bold d-block">Accent</span>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="p-2 border rounded bg-white text-center">
+                                        <div class="mx-auto rounded-circle mb-2" style="width: 24px; height: 24px; background: var(--sk-success);"></div>
+                                        <span class="small fw-bold d-block">Success</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. PROBLEM STATEMENT SECTION -->
+    <section class="about-section bg-light border-bottom">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">The Obstacles</span>
+                <h2 class="section-title">The Challenge of Modern Web Coloring</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="problem-card">
+                        <div class="icon-box icon-box-danger"><i class="fa-solid fa-puzzle-piece"></i></div>
+                        <h3 class="h5 fw-bold text-heading">Incompatible Schemes</h3>
+                        <p class="text-secondary small mb-0">Many palettes look great as simple swatches but clash, become illegible, or lose coherence when laid out in real columns, headers, or buttons.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="problem-card">
+                        <div class="icon-box icon-box-danger"><i class="fa-solid fa-circle-half-stroke"></i></div>
+                        <h3 class="h5 fw-bold text-heading">Readability & Access</h3>
+                        <p class="text-secondary small mb-0">Creating modern layouts requires adhering to WCAG AA guidelines to prevent locking out colorblind visitors or users in low-light environments.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="problem-card">
+                        <div class="icon-box icon-box-danger"><i class="fa-solid fa-code-fork"></i></div>
+                        <h3 class="h5 fw-bold text-heading">Translation to Code</h3>
+                        <p class="text-secondary small mb-0">Converting raw hex codes into clean, standard Tailwind CSS blocks, SCSS parameters, or CSS variables represents a time-consuming step in deployment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. SOLUTION SECTION -->
+    <section class="about-section border-bottom">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">Our Answer</span>
+                <h2 class="section-title">The Skilite Build Solution</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="solution-card">
+                        <div class="icon-box"><i class="fa-solid fa-sliders"></i></div>
+                        <h3 class="h6 fw-bold text-heading">Manual Fine-Tuning</h3>
+                        <p class="text-secondary small mb-0">An advanced palette editor providing complete control over every specific color role.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="solution-card">
+                        <div class="icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <h3 class="h6 fw-bold text-heading">Intelligent Engine</h3>
+                        <p class="text-secondary small mb-0">Rule-based professional recommendations tailored to match your specific industry vertical.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="solution-card">
+                        <div class="icon-box"><i class="fa-solid fa-desktop"></i></div>
+                        <h3 class="h6 fw-bold text-heading">Interactive Previews</h3>
+                        <p class="text-secondary small mb-0">Live responsive previews rendered across 14 industry categories and multiple device widths.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="solution-card">
+                        <div class="icon-box"><i class="fa-solid fa-file-export"></i></div>
+                        <h3 class="h6 fw-bold text-heading">Clean Exports</h3>
+                        <p class="text-secondary small mb-0">Ready-made exports in 7 formats including Tailwind, React themes, CSS, and Android Compose.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. SEMANTIC COLOUR SYSTEM SECTION -->
+    <section class="about-section bg-light border-bottom">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">Semantic Mapping</span>
+                <h2 class="section-title">Our 13 Semantic Roles</h2>
+                <p class="text-secondary max-width-600 mx-auto">A semantic role defines the functional context for each color, separating the content purpose from the raw hex values.</p>
+            </div>
+            <div class="role-card-grid">
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-primary);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Primary</strong>
+                        <span class="text-muted small">Brand & key actions</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-secondary);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Secondary</strong>
+                        <span class="text-muted small">Supporting content</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-accent);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Accent</strong>
+                        <span class="text-muted small">Highlights & badges</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-background);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Background</strong>
+                        <span class="text-muted small">Canvas background</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-surface);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Surface</strong>
+                        <span class="text-muted small">Cards & modals</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-heading);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Heading</strong>
+                        <span class="text-muted small">Titles & headers</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-body);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Body Text</strong>
+                        <span class="text-muted small">Standard descriptions</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-muted);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Muted Text</strong>
+                        <span class="text-muted small">Subtle captions</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-border);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Border</strong>
+                        <span class="text-muted small">Dividers & strokes</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-success);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Success</strong>
+                        <span class="text-muted small">Confirmations</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: #f59e0b;"></div>
+                    <div>
+                        <strong class="text-heading d-block">Warning</strong>
+                        <span class="text-muted small">Alerts & messages</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: var(--sk-danger);"></div>
+                    <div>
+                        <strong class="text-heading d-block">Danger</strong>
+                        <span class="text-muted small">Critical failures</span>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="role-color-indicator" style="background-color: #0284c7;"></div>
+                    <div>
+                        <strong class="text-heading d-block">Info</strong>
+                        <span class="text-muted small">General guidelines</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. HOW IT WORKS SECTION -->
+    <section class="about-section border-bottom">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">Process</span>
+                <h2 class="section-title">The Four-Step Workflow</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="d-inline-flex justify-content-center align-items-center bg-primary text-white rounded-circle fw-bold mb-3" style="width: 3rem; height: 3rem; font-size: 1.25rem;">1</div>
+                        <h4 class="h5 fw-bold text-heading">Setup</h4>
+                        <p class="text-secondary small">Start manually or pick a category preset to kick off your system.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="d-inline-flex justify-content-center align-items-center bg-primary text-white rounded-circle fw-bold mb-3" style="width: 3rem; height: 3rem; font-size: 1.25rem;">2</div>
+                        <h4 class="h5 fw-bold text-heading">Generate</h4>
+                        <p class="text-secondary small">Generate, tune, or pick recommended tones matching your visual mood.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="d-inline-flex justify-content-center align-items-center bg-primary text-white rounded-circle fw-bold mb-3" style="width: 3rem; height: 3rem; font-size: 1.25rem;">3</div>
+                        <h4 class="h5 fw-bold text-heading">Preview</h4>
+                        <p class="text-secondary small">Review changes live on our embedded client website component portal.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="d-inline-flex justify-content-center align-items-center bg-primary text-white rounded-circle fw-bold mb-3" style="width: 3rem; height: 3rem; font-size: 1.25rem;">4</div>
+                        <h4 class="h5 fw-bold text-heading">Export</h4>
+                        <p class="text-secondary small">Export the finalized theme rules directly into code-ready formats.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. TARGET USERS -->
+    <section class="about-section bg-light border-bottom">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">Audience</span>
+                <h2 class="section-title">Who is Skilite Build For?</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="p-4 border rounded bg-white text-center shadow-sm">
+                        <div class="icon-box mx-auto"><i class="fa-solid fa-laptop-code"></i></div>
+                        <h4 class="h5 fw-bold text-heading">Developers</h4>
+                        <p class="text-secondary small mb-0">Bypass design decisions. Generate contrast-passing color roles, preview them, and export copy-pasteable configurations instantly.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 border rounded bg-white text-center shadow-sm">
+                        <div class="icon-box mx-auto"><i class="fa-solid fa-palette"></i></div>
+                        <h4 class="h5 fw-bold text-heading">UI/UX Designers</h4>
+                        <p class="text-secondary small mb-0">Create accessible color systems. Test them in realistic light/dark environments and share links with your development team.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 border rounded bg-white text-center shadow-sm">
+                        <div class="icon-box mx-auto"><i class="fa-solid fa-briefcase"></i></div>
+                        <h4 class="h5 fw-bold text-heading">Business Owners</h4>
+                        <p class="text-secondary small mb-0">Preview how your branding colors look on a complete website. Tailor elements before paying for custom design development.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. MISSION, VISION, AND VALUES -->
+    <section class="about-section border-bottom">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <h3 class="h4 fw-bold text-heading mb-3"><i class="fa-solid fa-bullseye me-2 text-primary"></i>Mission & Vision</h3>
+                    <div class="mb-4">
+                        <strong>Our Mission:</strong>
+                        <p class="text-secondary">Make professional website color selection practical, accessible, and understandable for creators and businesses globally.</p>
+                    </div>
+                    <div>
+                        <strong>Our Vision:</strong>
+                        <p class="text-secondary">Provide an accessible, open-source color-system platform that bridges the gap between pure design aesthetics and frontend engineering standards.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <h3 class="h4 fw-bold text-heading mb-3"><i class="fa-solid fa-heart me-2 text-danger"></i>Core Values</h3>
+                    <ul class="list-unstyled d-flex flex-column gap-2 text-secondary">
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i><strong>Usability</strong>: Simplicity first in everything we build.</li>
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i><strong>Accessibility</strong>: Strictly promoting WCAG contrast guidelines.</li>
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i><strong>Consistency</strong>: Promoting clean semantic logic over chaotic swatches.</li>
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i><strong>Community</strong>: Open sharing and library copying options.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. TECHNOLOGY SECTION -->
+    <section class="about-section bg-light border-bottom">
+        <div class="container">
+            <div class="text-center mb-4">
+                <span class="section-kicker">Stack</span>
+                <h2 class="section-title">Built with Modern Tech</h2>
+            </div>
+            <div class="tech-badge-list justify-content-center">
+                <span class="tech-badge"><i class="fa-brands fa-python me-2 text-primary"></i>Python 3.12</span>
+                <span class="tech-badge"><i class="fa-solid fa-server me-2 text-success"></i>Django 5.2</span>
+                <span class="tech-badge"><i class="fa-solid fa-database me-2 text-info"></i>PostgreSQL</span>
+                <span class="tech-badge"><i class="fa-brands fa-html5 me-2 text-danger"></i>HTML5</span>
+                <span class="tech-badge"><i class="fa-brands fa-css3-alt me-2 text-primary"></i>CSS3 & CSS Variables</span>
+                <span class="tech-badge"><i class="fa-brands fa-js me-2 text-warning"></i>JavaScript (ES6)</span>
+                <span class="tech-badge"><i class="fa-brands fa-bootstrap me-2 text-purple" style="color: #6f42c1;"></i>Bootstrap 5</span>
+                <span class="tech-badge"><i class="fa-brands fa-git-alt me-2 text-danger"></i>Git & GitHub</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. FINAL CALL TO ACTION -->
+    <section class="about-section">
+        <div class="container">
+            <div class="cta-banner">
+                <h2>Ready to build your color system?</h2>
+                <p class="lead mb-4" style="max-width: 600px; margin: 0 auto;">Select from manual configurations, preset categories, or rules-based business recommendations.</p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'palettes:editor' %}" class="btn btn-light btn-lg px-4 text-primary">
+                        <i class="fa-solid fa-palette me-2"></i>Start Building
+                    </a>
+                    <a href="{% url 'recommendations:index' %}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Get Recommendation
+                    </a>
+                    <a href="{% url 'palettes:presets' %}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fa-solid fa-layer-group me-2"></i>Explore Presets
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+{% endblock %}

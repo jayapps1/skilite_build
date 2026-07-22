@@ -154,3 +154,127 @@ class CommunityGalleryTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["views_count"], 1)
         self.assertEqual(PaletteView.objects.filter(palette=self.public_palette).count(), 1)
+
+    def test_like_toggle_anonymous_ajax(self):
+        """
+        Verify that unauthenticated users can successfully toggle a like.
+        """
+        url = reverse("community:like", kwargs={"slug": self.public_palette.slug})
+        
+        # Like
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["liked"], True)
+        self.assertEqual(response.json()["likes_count"], 1)
+        self.assertEqual(PaletteLike.objects.filter(palette=self.public_palette, user__isnull=True).count(), 1)
+
+        # Unlike
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["liked"], False)
+        self.assertEqual(response.json()["likes_count"], 0)
+        self.assertEqual(PaletteLike.objects.filter(palette=self.public_palette, user__isnull=True).count(), 0)
+
+    def test_public_approved_palette_detail_loads(self):
+        """1. Public approved palette detail loads successfully."""
+        url = reverse("community:palette_detail", kwargs={"slug": self.public_palette.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.public_palette.name)
+
+    def test_private_palette_detail_returns_404_unauthorized(self):
+        """2. Private palette detail returns 404 for unauthorized users."""
+        url = reverse("community:palette_detail", kwargs={"slug": self.private_palette.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_unapproved_palette_detail_returns_404_normal_visitor(self):
+        """3. Unapproved palette detail returns 404 for normal visitors."""
+        unapproved = self.create_complete_palette(
+            name="Unapproved Public",
+            owner=self.user1,
+            visibility=PaletteVisibility.PUBLIC,
+            is_published=True,
+        )
+        unapproved.moderation_status = ModerationStatus.REJECTED
+        unapproved.save()
+        url = reverse("community:palette_detail", kwargs={"slug": unapproved.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_palette_owner_can_access_own_private_detail(self):
+        """4. Palette owner can access permitted owner views (like private palettes)."""
+        self.client.login(username="user1", password="Password123!")
+        url = reverse("community:palette_detail", kwargs={"slug": self.private_palette.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.private_palette.name)
+
+    def test_community_detail_includes_all_13_colors(self):
+        """5. Community detail includes all 13 colors in swatches."""
+        url = reverse("community:palette_detail", kwargs={"slug": self.public_palette.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        # Verify 13 swatches exist in ordered_colors context
+        self.assertEqual(len(response.context["ordered_colors"]), 13)
+
+    def test_community_detail_includes_preview_configuration(self):
+        """6. Community detail includes preview configuration."""
+        url = reverse("community:palette_detail", kwargs={"slug": self.public_palette.slug})
+        response = self.client.get(url)
+        self.assertIn("preview_colors", response.context)
+        self.assertEqual(len(response.context["preview_colors"]), 13)
+
+    def test_copy_action_requires_post(self):
+        """7. Copy action requires POST."""
+        self.client.login(username="user2", password="Password123!")
+        url = reverse("community:copy", kwargs={"slug": self.public_palette.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405) # Method Not Allowed
+
+    def test_copy_action_requires_authentication(self):
+        """8. Copy action requires authentication (redirects to login)."""
+        url = reverse("community:copy", kwargs={"slug": self.public_palette.slug})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("accounts:login"), response.url)
+
+    def test_copy_action_creates_private_user_palette(self):
+        """9. Copy action creates a private user-owned palette."""
+        self.client.login(username="user2", password="Password123!")
+        url = reverse("community:copy", kwargs={"slug": self.public_palette.slug})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        copied = Palette.objects.filter(owner=self.user2).first()
+        self.assertEqual(copied.visibility, PaletteVisibility.PRIVATE)
+
+    def test_copy_action_copies_all_13_colors(self):
+        """10. Copy action copies all 13 colors."""
+        self.client.login(username="user2", password="Password123!")
+        url = reverse("community:copy", kwargs={"slug": self.public_palette.slug})
+        self.client.post(url)
+        copied = Palette.objects.filter(owner=self.user2).first()
+        self.assertEqual(copied.colors.count(), 13)
+
+    def test_copy_action_creates_palette_copy_record(self):
+        """11. Copy action creates a PaletteCopy record."""
+        self.client.login(username="user2", password="Password123!")
+        url = reverse("community:copy", kwargs={"slug": self.public_palette.slug})
+        self.client.post(url)
+        self.assertTrue(PaletteCopy.objects.filter(source_palette=self.public_palette).exists())
+
+    def test_export_permission_is_respected(self):
+        """14. Export permission is respected."""
+        # Test case: allow_export is True
+        self.public_palette.allow_export = True
+        self.public_palette.save()
+        url = reverse("community:export_palette", kwargs={"slug": self.public_palette.slug, "export_format": "CSS"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("attachment; filename=", response["Content-Disposition"])
+
+        # Test case: allow_export is False
+        self.public_palette.allow_export = False
+        self.public_palette.save()
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)

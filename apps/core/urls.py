@@ -1,7 +1,6 @@
 from django.urls import path
-from django.views.generic import TemplateView
 
-from .views import HomeView
+from .views import HomeView, AboutView, ContactView, ContactSuccessView
 
 
 app_name = "core"
@@ -13,34 +12,19 @@ urlpatterns = [
         HomeView.as_view(),
         name="home",
     ),
-
     path(
         "about/",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "About Skilite Build",
-                "page_message": (
-                    "Learn more about the Skilite Build "
-                    "website colour-system platform."
-                ),
-            },
-        ),
+        AboutView.as_view(),
         name="about",
     ),
-
     path(
         "contact/",
-        TemplateView.as_view(
-            template_name="base/coming_soon.html",
-            extra_context={
-                "page_title": "Contact",
-                "page_message": (
-                    "The Skilite Build contact page "
-                    "is being prepared."
-                ),
-            },
-        ),
+        ContactView.as_view(),
         name="contact",
+    ),
+    path(
+        "contact/success/<str:enquiry_code>/",
+        ContactSuccessView.as_view(),
+        name="contact_success",
     ),
 ]

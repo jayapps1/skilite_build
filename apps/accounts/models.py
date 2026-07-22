@@ -18,6 +18,27 @@ class User(AbstractUser):
         unique=True,
     )
 
+    phone_number = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        unique=True,
+    )
+
+    must_change_password = models.BooleanField(
+        default=False,
+    )
+
+    totp_secret = models.CharField(
+        max_length=32,
+        blank=True,
+        null=True,
+    )
+
+    totp_enabled = models.BooleanField(
+        default=False,
+    )
+
     class Meta:
         db_table = "users"
         ordering = ["-date_joined"]
@@ -34,6 +55,28 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.username
+
+
+class OTPCode(TimeStampedModel):
+    """
+    One-Time Password code for forgot-password and phone verification.
+    """
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="otp_codes",
+    )
+    code = models.CharField(max_length=6)
+    is_used = models.BooleanField(default=False)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        db_table = "otp_codes"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.user.username} - {self.code} (Expires: {self.expires_at})"
 
 
 class UserProfile(TimeStampedModel):

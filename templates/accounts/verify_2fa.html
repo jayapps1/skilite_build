@@ -1,0 +1,139 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}
+    Two-Factor Verification | Skilite Build
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+    <style>
+        .otp-digits-wrapper {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+        }
+        .otp-cell {
+            width: 3rem;
+            height: 3.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 2px solid var(--border-color, #cbd5e1);
+            border-radius: 0.5rem;
+            background-color: var(--surface-color, #ffffff);
+            color: var(--text-color, #0f172a);
+            transition: all 0.2s ease;
+        }
+        .otp-cell:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            outline: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <a class="skilite-brand mb-3" href="{% url 'core:home' %}">
+                <span class="brand-symbol">
+                    <i class="fa-solid fa-palette"></i>
+                </span>
+                <span class="brand-name">
+                    Skilite <strong>Build</strong>
+                </span>
+            </a>
+            <h1>Two-Factor Verification</h1>
+            <p>Enter the 6-digit verification code from your Google Authenticator app. Form submits automatically when fully entered.</p>
+        </div>
+
+        {% include "components/messages.html" %}
+
+        <form method="post" action="{% url 'accounts:verify_2fa' %}" id="otp-form" novalidate>
+            {% csrf_token %}
+
+            <div class="otp-digits-wrapper my-4">
+                <input type="text" name="digit1" class="otp-cell" maxlength="1" required autocomplete="off" inputmode="numeric" pattern="[0-9]*" autofocus>
+                <input type="text" name="digit2" class="otp-cell" maxlength="1" required autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" name="digit3" class="otp-cell" maxlength="1" required autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" name="digit4" class="otp-cell" maxlength="1" required autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" name="digit5" class="otp-cell" maxlength="1" required autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                <input type="text" name="digit6" class="otp-cell" maxlength="1" required autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-3 mt-2">
+                <i class="fa-solid fa-shield-check me-2"></i>Verify & Login
+            </button>
+        </form>
+
+        <hr class="my-4 text-muted">
+
+        <div class="text-center">
+            <a href="{% url 'accounts:login' %}" class="btn btn-link text-decoration-none p-0 fw-bold">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to Sign In
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const cells = document.querySelectorAll(".otp-cell");
+        
+        cells.forEach((cell, idx) => {
+            // Auto advance on input
+            cell.addEventListener("input", (e) => {
+                // Ensure only digits are typed
+                cell.value = cell.value.replace(/[^0-9]/g, "");
+                
+                if (cell.value.length === 1 && idx < cells.length - 1) {
+                    cells[idx + 1].focus();
+                }
+
+                // Auto-submit if all 6 cells are filled
+                const allFilled = Array.from(cells).every(c => c.value.length === 1);
+                if (allFilled) {
+                    document.getElementById("otp-form").submit();
+                }
+            });
+
+            // Backspace navigation
+            cell.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace") {
+                    if (cell.value.length === 0 && idx > 0) {
+                        cells[idx - 1].focus();
+                    }
+                }
+            });
+
+            // Handle paste operations
+            cell.addEventListener("paste", (e) => {
+                const pasteData = (e.clipboardData || window.clipboardData).getData("text");
+                const cleanDigits = pasteData.replace(/[^0-9]/g, "").slice(0, 6);
+                
+                if (cleanDigits.length > 0) {
+                    cleanDigits.split("").forEach((char, cIdx) => {
+                        if (cells[cIdx]) {
+                            cells[cIdx].value = char;
+                            if (cIdx < cells.length - 1) {
+                                cells[cIdx + 1].focus();
+                            }
+                        }
+                    });
+                    
+                    // Auto-submit if all 6 cells are filled after paste
+                    const allFilled = Array.from(cells).every(c => c.value.length === 1);
+                    if (allFilled) {
+                        document.getElementById("otp-form").submit();
+                    }
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,267 @@
+<div id="preview-section-home" class="preview-section">
+    <!-- Hero Section -->
+    <section class="preview-hero-section" id="preview-hero-element">
+        <!-- Background Media Container (Visible in HERO_BACKGROUND, HERO_PRODUCT, HERO_EDITORIAL modes) -->
+        <div class="preview-hero-media">
+            <!-- Desktop webp photograph -->
+            <img class="hero-media-img hero-img-desktop d-none d-md-block" data-type="hero_desktop" alt="Business Hero Desktop View">
+            <!-- Mobile webp photograph -->
+            <img class="hero-media-img hero-img-mobile d-md-none" data-type="hero_mobile" alt="Business Hero Mobile View">
+            <div class="preview-hero-overlay"></div>
+        </div>
+
+        <div class="hero-layout-grid-container container-fluid px-4 py-5">
+            <div class="row align-items-center g-4">
+                <!-- Text Column (adjusts width dynamically per category layout) -->
+                <div class="col-lg-7 text-content-col">
+                    <!-- Status / Trust indicator -->
+                    <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                        <span class="badge bg-success text-white px-2.5 py-1 text-uppercase font-monospace" style="font-size: 0.68rem; letter-spacing: 0.05em;" id="preview-hero-status-badge">
+                            <i class="fa-solid fa-circle-check me-1"></i>Verified Business
+                        </span>
+                        <div class="d-flex align-items-center gap-1 preview-text-accent" style="font-size: 0.8rem; font-weight: 700;">
+                            <i class="fa-solid fa-star"></i>
+                            <span id="preview-hero-rating">4.9</span>
+                            <span class="preview-text-muted" style="font-size: 0.72rem; font-weight: 400;">(140+ reviews)</span>
+                        </div>
+                    </div>
+
+                    <span class="business-preview-kicker preview-text-accent d-block mb-2" id="preview-kicker">
+                        Premium Business Solutions
+                    </span>
+                    
+                    <h2 id="preview-headline" class="preview-text-heading mt-1 mb-3 fw-extrabold tracking-tight">
+                        Elevate your brand presence
+                    </h2>
+                    
+                    <p id="preview-description" class="preview-text-body mb-4 fs-5" style="opacity: 0.95;">
+                        Experience professional layouts built to showcase your business color palette.
+                    </p>
+                    
+                    <div class="d-flex gap-3 flex-wrap align-items-center btn-actions-row">
+                        <button type="button" id="preview-primary-btn" class="preview-primary-button px-4 py-2.5 border-0 rounded shadow-sm fw-bold">
+                            Get Started
+                        </button>
+                        <button type="button" id="preview-secondary-btn" class="preview-secondary-button px-4 py-2.5 rounded fw-bold">
+                            Learn More
+                        </button>
+                    </div>
+
+                    <!-- Trust indicators / Floating statistics card strip -->
+                    <div class="d-flex align-items-center gap-4 mt-4 pt-4 border-top border-light-subtle trust-statistics-strip">
+                        <div>
+                            <strong class="h4 fw-bold d-block mb-0 preview-text-primary" id="preview-stat-number-1">10k+</strong>
+                            <span class="small preview-text-muted" id="preview-stat-label-1">Active Clients</span>
+                        </div>
+                        <div class="vr" style="background-color: var(--preview-border); width: 1px; height: 30px; opacity: 0.25;"></div>
+                        <div>
+                            <strong class="h4 fw-bold d-block mb-0 preview-text-primary" id="preview-stat-number-2">99.9%</strong>
+                            <span class="small preview-text-muted" id="preview-stat-label-2">Uptime Rate</span>
+                        </div>
+                        <div class="vr" style="background-color: var(--preview-border); width: 1px; height: 30px; opacity: 0.25;"></div>
+                        <div>
+                            <strong class="h4 fw-bold d-block mb-0 preview-text-primary" id="preview-stat-number-3">15+</strong>
+                            <span class="small preview-text-muted" id="preview-stat-label-3">Years Exp</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media Column (Visible in HERO_SPLIT and HERO_COLLAGE modes) -->
+                <div class="col-lg-5 media-content-col">
+                    <!-- Split Layout Image -->
+                    <div class="split-hero-image-wrapper rounded shadow-lg overflow-hidden border" style="border-color: var(--preview-border) !important;">
+                        <img class="split-media-img w-100 h-100" data-type="hero_desktop" alt="SaaS Product Preview" style="object-fit: cover; min-height: 300px;">
+                    </div>
+
+                    <!-- Collage Layout Images -->
+                    <div class="collage-hero-wrapper position-relative" style="min-height: 340px;">
+                        <div class="collage-img-main rounded shadow-lg overflow-hidden border position-absolute" style="width: 75%; height: 260px; top: 0; left: 0; z-index: 2; border-color: var(--preview-border) !important;">
+                            <img class="w-100 h-100" data-type="hero_desktop" alt="Main Collage Visual" style="object-fit: cover;">
+                        </div>
+                        <div class="collage-img-sub rounded shadow-md overflow-hidden border position-absolute" style="width: 50%; height: 160px; bottom: 0; right: 0; z-index: 3; border-color: var(--preview-border) !important;">
+                            <img class="w-100 h-100" data-type="about" alt="Secondary Collage Visual" style="object-fit: cover;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real Estate / Booking Search Overlay Form (Visible in HERO_PRODUCT mode) -->
+            <div class="hero-search-overlay-form-container mt-4 pt-3 d-none" id="preview-hero-search-form">
+                <div class="p-3 rounded shadow-lg border" style="background: var(--preview-surface); border-color: var(--preview-border) !important; max-width: 800px; margin: 0 auto;">
+                    <form class="row g-2" onsubmit="event.preventDefault();">
+                        <div class="col-md-4">
+                            <label class="small fw-semibold d-block mb-1 preview-text-heading">Location</label>
+                            <select class="form-select form-select-sm preview-input" style="border-color: var(--preview-border); color: var(--preview-body-text);">
+                                <option>Accra Central, Greater Accra</option>
+                                <option>East Legon Executive</option>
+                                <option>Cantonments Residential</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small fw-semibold d-block mb-1 preview-text-heading">Option Type</label>
+                            <select class="form-select form-select-sm preview-input" style="border-color: var(--preview-border); color: var(--preview-body-text);">
+                                <option>Residential Apartment</option>
+                                <option>Commercial Office Lease</option>
+                                <option>Litigation-Free Land Lot</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="button" class="preview-primary-button w-100 py-1.5 rounded border-0 fw-bold text-center" style="font-size: 0.85rem;">
+                                <i class="fa-solid fa-magnifying-glass me-1"></i>Search Properties
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Client Logs Trust Strip (Technology/Corporate context) -->
+    <section class="preview-client-strip py-3 border-bottom" style="background: var(--preview-surface); border-color: var(--preview-border) !important;">
+        <div class="container text-center">
+            <span class="small text-uppercase font-monospace preview-text-muted" style="letter-spacing: 0.1em; font-size: 0.72rem;">Trusted by industry leaders</span>
+            <div class="d-flex justify-content-center align-items-center gap-5 mt-2 flex-wrap" style="opacity: 0.6; filter: grayscale(1);">
+                <span class="fw-extrabold h5 mb-0">GLICO</span>
+                <span class="fw-extrabold h5 mb-0">ZENITH</span>
+                <span class="fw-extrabold h5 mb-0">SHOPNOW</span>
+                <span class="fw-extrabold h5 mb-0">MTN</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services & Catalog Section -->
+    <section class="preview-catalog-section p-4 py-5" style="background: var(--preview-background);">
+        <div class="text-center mb-5">
+            <span class="business-preview-kicker text-uppercase small font-monospace preview-text-accent" id="preview-features-kicker">Catalog & Services</span>
+            <h3 class="h3 fw-bold mt-1 preview-text-heading" id="preview-features-headline">Our Services & Products</h3>
+            <p class="small preview-text-muted mb-0 mx-auto" style="max-width: 500px;" id="preview-features-sub">Explore our curated catalog with details, prices, and availability.</p>
+        </div>
+
+        <!-- Dynamic Service cards container -->
+        <div class="row g-4 justify-content-center" id="preview-features-container">
+            <!-- Populated dynamically via JS -->
+        </div>
+    </section>
+
+    <!-- Narrative Section (Editorial layout) -->
+    <section class="preview-narrative-section p-4 py-5 border-top border-bottom" style="background: var(--preview-surface); border-color: var(--preview-border) !important;">
+        <div class="row align-items-center g-4 text-start">
+            <div class="col-md-6">
+                <span class="business-preview-kicker text-uppercase small font-monospace preview-text-accent">Our Philosophy</span>
+                <h3 class="h3 fw-bold mt-1 preview-text-heading">Commitment to Excellence</h3>
+                <p class="preview-text-body mt-3 mb-4" style="line-height: 1.75;">
+                    We believe in delivering outstanding operations. Our focus is centered on safety, high-grade material testing, and verified compliance parameters.
+                </p>
+                <div class="p-3 rounded border border-start-3 border-start-primary d-flex align-items-start gap-3" style="background: var(--preview-background); border-color: var(--preview-border) !important; border-left-color: var(--preview-primary) !important;">
+                    <i class="fa-solid fa-quote-left h3 preview-text-primary mb-0 opacity-50"></i>
+                    <p class="small preview-text-body italic mb-0">"Sustainability and customer satisfaction drive every operational milestone we target."</p>
+                </div>
+            </div>
+            <div class="col-md-6 text-center">
+                <div class="rounded shadow overflow-hidden border" style="height: 240px; border-color: var(--preview-border) !important;">
+                    <img class="w-100 h-100" data-type="about" alt="About Action Image" style="object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Asymmetrical Gallery Section -->
+    <section class="preview-gallery-section p-4 py-5" style="background: var(--preview-background);">
+        <div class="text-center mb-5">
+            <span class="business-preview-kicker text-uppercase small font-monospace preview-text-accent">Visual Portfolio</span>
+            <h3 class="h3 fw-bold mt-1 preview-text-heading">Project Gallery</h3>
+            <p class="small preview-text-muted mb-0">Browse completed corporate visual works.</p>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="preview-gallery-item-wrapper rounded shadow-sm overflow-hidden border position-relative" style="height: 320px; border-color: var(--preview-border) !important;">
+                    <img class="w-100 h-100" data-type="gallery" data-index="0" alt="Gallery Showcase 1" style="object-fit: cover;">
+                    <div class="gallery-hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-end p-3 text-white text-start" style="background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.8) 100%);">
+                        <strong class="h6 mb-0">Featured Operations</strong>
+                        <span class="small text-white-50">Operational visual capture</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="preview-gallery-item-wrapper rounded shadow-sm overflow-hidden border position-relative" style="height: 152px; border-color: var(--preview-border) !important;">
+                            <img class="w-100 h-100" data-type="gallery" data-index="1" alt="Gallery Showcase 2" style="object-fit: cover;">
+                            <div class="gallery-hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-end p-2 text-white text-start" style="background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.8) 100%);">
+                                <strong class="small mb-0">Creative Innovation</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="preview-gallery-item-wrapper rounded shadow-sm overflow-hidden border position-relative" style="height: 152px; border-color: var(--preview-border) !important;">
+                            <img class="w-100 h-100" data-type="gallery" data-index="2" alt="Gallery Showcase 3" style="object-fit: cover;">
+                            <div class="gallery-hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-end p-2 text-white text-start" style="background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.8) 100%);">
+                                <strong class="small mb-0">Corporate Workspace</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="preview-testimonials p-4 py-5 border-top" style="background: var(--preview-surface); border-color: var(--preview-border) !important;">
+        <div class="text-center mb-5">
+            <span class="business-preview-kicker text-uppercase small font-monospace preview-text-accent">Testimonials</span>
+            <h3 class="h3 fw-bold mt-1 preview-text-heading">What Our Clients Say</h3>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-4 rounded preview-card-element h-100 d-flex flex-column justify-content-between text-start border shadow-sm" style="border-color: var(--preview-border) !important;">
+                    <p class="small preview-text-body italic mb-3" id="preview-testimonial-text-1">"Outstanding service! The custom color configurations made branding our web systems incredibly straightforward."</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <img class="preview-avatar-img rounded-circle" data-type="testimonial" data-index="0" alt="Sarah Jenkins" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid var(--preview-primary);">
+                        <div>
+                            <strong class="small preview-text-heading d-block" id="preview-testimonial-author-1">Sarah Jenkins</strong>
+                            <span class="preview-text-muted" style="font-size: 0.72rem;" id="preview-testimonial-role-1">CEO, TechNova</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 rounded preview-card-element h-100 d-flex flex-column justify-content-between text-start border shadow-sm" style="border-color: var(--preview-border) !important;">
+                    <p class="small preview-text-body italic mb-3" id="preview-testimonial-text-2">"Beautiful clean UI. Our customers loved the updated surface cards and responsive navigation design."</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <img class="preview-avatar-img rounded-circle" data-type="testimonial" data-index="1" alt="David Osei" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid var(--preview-primary);">
+                        <div>
+                            <strong class="small preview-text-heading d-block" id="preview-testimonial-author-2">David Osei</strong>
+                            <span class="preview-text-muted" style="font-size: 0.72rem;" id="preview-testimonial-role-2">Founder, Savanna Foods</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 rounded preview-card-element h-100 d-flex flex-column justify-content-between text-start border shadow-sm" style="border-color: var(--preview-border) !important;">
+                    <p class="small preview-text-body italic mb-3" id="preview-testimonial-text-3">"Very reliable. The integration matches all expectations and visual guidelines perfectly."</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <img class="preview-avatar-img rounded-circle" data-type="testimonial" data-index="2" alt="Rebecca Mensah" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid var(--preview-primary);">
+                        <div>
+                            <strong class="small preview-text-heading d-block" id="preview-testimonial-author-3">Rebecca Mensah</strong>
+                            <span class="preview-text-muted" style="font-size: 0.72rem;" id="preview-testimonial-role-3">Director, Zenith</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action (Widescreen photographic CTA layout) -->
+    <section class="preview-cta-block p-4 py-5 text-center text-white position-relative overflow-hidden" style="min-height: 240px; display: flex; align-items: center; justify-content: center;">
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="z-index: 1;">
+            <img class="w-100 h-100" data-type="cta" alt="Call to Action Background" style="object-fit: cover;">
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.65);"></div>
+        </div>
+        <div class="position-relative p-4 rounded text-center" style="z-index: 2; max-width: 650px;">
+            <h3 class="h3 fw-bold text-white mb-2" id="preview-cta-title">Ready to take the next step?</h3>
+            <p class="small text-white-50 mb-4" id="preview-cta-subtitle">Start planning your business strategy with our professional consultants today.</p>
+            <button type="button" class="preview-primary-button px-4 py-2 border-0 rounded fw-bold text-white" id="preview-cta-btn">Join Us Now</button>
+        </div>
+    </section>
+</div>

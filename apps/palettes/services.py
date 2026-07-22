@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils import timezone
 
 from apps.community.models import PaletteCopy
 from apps.core.choices import (
@@ -477,6 +478,7 @@ class PaletteLifecycleService:
             ModerationStatus.REMOVED
         )
         palette.published_at = None
+        palette.deleted_at = timezone.now()
 
         palette.full_clean()
         palette.save(
@@ -487,6 +489,38 @@ class PaletteLifecycleService:
                 "visibility",
                 "moderation_status",
                 "published_at",
+                "deleted_at",
+                "updated_at",
+            ]
+        )
+
+        return palette
+
+    @classmethod
+    @transaction.atomic
+    def restore(
+        cls,
+        *,
+        palette,
+    ):
+        """
+        Restore a soft-deleted user palette from the recycle bin.
+        """
+        if palette is None:
+            raise ValidationError(
+                "A palette is required."
+            )
+
+        palette.is_active = True
+        palette.deleted_at = None
+        palette.moderation_status = ModerationStatus.DRAFT
+
+        palette.full_clean()
+        palette.save(
+            update_fields=[
+                "is_active",
+                "deleted_at",
+                "moderation_status",
                 "updated_at",
             ]
         )

@@ -39,6 +39,7 @@
             </div>
             
             <nav class="sidebar-nav">
+                <div class="sidebar-section-header">Workspace</div>
                 <a href="{% url 'accounts:dashboard' %}" class="nav-item {% if request.resolver_match.view_name == 'accounts:dashboard' %}active{% endif %}">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span>Dashboard</span>
@@ -51,6 +52,12 @@
                     <i class="fa-solid fa-store"></i>
                     <span>Preset Gallery</span>
                 </a>
+                <a href="{% url 'palettes:recycle_bin' %}" class="nav-item {% if request.resolver_match.view_name == 'palettes:recycle_bin' %}active{% endif %}">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Recycle Bin</span>
+                </a>
+
+                <div class="sidebar-section-header">Account Settings</div>
                 <a href="{% url 'accounts:profile' %}" class="nav-item {% if request.resolver_match.view_name == 'accounts:profile' %}active{% endif %}">
                     <i class="fa-solid fa-user"></i>
                     <span>Profile</span>
@@ -59,10 +66,22 @@
                     <i class="fa-solid fa-sliders"></i>
                     <span>Settings</span>
                 </a>
+                <a href="{% url 'accounts:change_password' %}" class="nav-item {% if request.resolver_match.view_name == 'accounts:change_password' %}active{% endif %}">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Change Password</span>
+                </a>
                 <a href="{% url 'accounts:activity_log' %}" class="nav-item {% if request.resolver_match.view_name == 'accounts:activity_log' %}active{% endif %}">
                     <i class="fa-solid fa-shield-halved"></i>
                     <span>Activity Log</span>
                 </a>
+
+                {% if request.user.is_superuser %}
+                <div class="sidebar-section-header">Admin Controls</div>
+                <a href="{% url 'accounts:create_admin' %}" class="nav-item {% if request.resolver_match.view_name == 'accounts:create_admin' %}active{% endif %}">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span>Create Admin</span>
+                </a>
+                {% endif %}
             </nav>
             
             <div class="sidebar-footer">

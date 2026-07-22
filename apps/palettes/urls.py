@@ -10,6 +10,9 @@ from .views import (
     PaletteUpdateView,
     PresetPaletteListView,
     PalettePublishView,
+    RecycleBinView,
+    RestorePaletteView,
+    PermanentDeletePaletteView,
 )
 
 
@@ -33,6 +36,11 @@ urlpatterns = [
         name="presets",
     ),
     path(
+        "recycle-bin/",
+        RecycleBinView.as_view(),
+        name="recycle_bin",
+    ),
+    path(
         "presets/<slug:slug>/apply/",
         ApplyPresetView.as_view(),
         name="apply_preset",
@@ -51,6 +59,16 @@ urlpatterns = [
         "<slug:slug>/delete/",
         PaletteDeleteView.as_view(),
         name="delete",
+    ),
+    path(
+        "<slug:slug>/restore/",
+        RestorePaletteView.as_view(),
+        name="restore",
+    ),
+    path(
+        "<slug:slug>/permanent-delete/",
+        PermanentDeletePaletteView.as_view(),
+        name="permanent_delete",
     ),
     path(
         "<slug:slug>/publish/",

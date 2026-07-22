@@ -52,6 +52,16 @@
     flex-grow: 1;
 }
 
+.sidebar-section-header {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #64748b;
+    font-weight: 700;
+    margin: 1.25rem 1rem 0.5rem 1rem;
+    user-select: none;
+}
+
 .nav-item {
     display: flex;
     align-items: center;

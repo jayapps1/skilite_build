@@ -73,6 +73,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.accounts.middleware.MustChangePasswordMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -281,5 +282,18 @@ EXTRA_LANG_INFO = {
 }
 
 django.conf.locale.LANG_INFO.update(EXTRA_LANG_INFO)
+
+
+# ======================================================
+# CONTACT ENQUIRIES AND SUPPORT ENVIRONMENT SETTINGS
+# ======================================================
+SITE_CONTACT_EMAIL = os.environ.get("SITE_CONTACT_EMAIL", "nanagyachie@gmail.com")
+SITE_CONTACT_PHONE = os.environ.get("SITE_CONTACT_PHONE", "+233542011738")
+SITE_CONTACT_ADDRESS = os.environ.get("SITE_CONTACT_ADDRESS", "Central Region, Cape Coast")
+SITE_SUPPORT_HOURS = os.environ.get("SITE_SUPPORT_HOURS", "Mon - Fri: 9:00 AM - 5:00 PM GMT")
+
+CONTACT_NOTIFICATION_EMAIL = os.environ.get("CONTACT_NOTIFICATION_EMAIL", "nanagyachie@gmail.com")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@skilitebuild.com")
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
 
 

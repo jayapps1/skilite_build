@@ -1,0 +1,496 @@
+{% extends extend_template|default:"base/base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ palette.name }} | Skilite Build Community
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/palette-detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/palette-preview-site.css' %}">
+<style>
+    /* Styling refinements for the Community Details Layout */
+    .community-detail-layout {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+        margin-top: 1rem;
+    }
+    @media (max-width: 992px) {
+        .community-detail-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+    .palette-info-card {
+        background: var(--sk-surface);
+        border: 1px solid var(--sk-border);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+    }
+    .creator-profile-widget {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        background: rgba(0,0,0,0.02);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+    }
+    .creator-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--sk-primary);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    .detail-swatch-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    .detail-swatch-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem;
+        border-radius: 0.4rem;
+        border: 1px solid var(--sk-border);
+        background: #fff;
+        font-size: 0.85rem;
+    }
+    .detail-swatch-color-box {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 0.3rem;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+    .accessibility-card {
+        border: 1px solid var(--sk-border);
+        background: rgba(0,0,0,0.01);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        font-size: 0.8rem;
+    }
+    .accessibility-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.25rem;
+        font-weight: 700;
+    }
+    .badge-pass {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+    .badge-fail {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+    /* Heart highlight styling */
+    .btn-like.liked i {
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="{% if not request.GET.hide_chrome %}py-3{% endif %}">
+    <div class="{% if not request.GET.hide_chrome %}container-fluid px-4{% endif %}">
+        
+        {% if not request.GET.hide_chrome %}
+        <!-- Breadcrumb & Toolbar Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'community:gallery' %}" class="text-decoration-none">Community Gallery</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ palette.name }}</li>
+                    </ol>
+                </nav>
+                <h1 class="h3 fw-bold text-heading mb-0">{{ palette.name }}</h1>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-share-palette">
+                    <i class="fa-solid fa-share-nodes me-1"></i>Share Link
+                </button>
+                <a href="{% url 'community:report' palette.slug %}" class="btn btn-outline-danger btn-sm">
+                    <i class="fa-solid fa-flag me-1"></i>Report
+                </a>
+                
+                {% if is_owner %}
+                    <a href="{% url 'palettes:edit' palette.slug %}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-pen-to-square me-1"></i>Edit Palette
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="community-detail-layout" style="{% if request.GET.hide_chrome %}grid-template-columns: 1fr; margin: 0; gap: 0;{% endif %}">
+            
+            {% if not request.GET.hide_chrome %}
+            <!-- AREA 1: PALETTE INFORMATION PANEL (LEFT) -->
+            <aside class="d-flex flex-column gap-3">
+                
+                <!-- Main Metadata Card -->
+                <div class="palette-info-card shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-secondary text-uppercase">{{ palette.get_theme_mode_display }}</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary border-0 btn-like {% if user_liked %}liked{% endif %}" data-slug="{{ palette.slug }}">
+                            <i class="{% if user_liked %}fa-solid{% else %}fa-regular{% endif %} fa-heart me-1"></i>
+                            <span class="like-count">{{ likes_count }}</span>
+                        </button>
+                    </div>
+
+                    <p class="text-secondary small mt-2 mb-3">{{ palette.description|default:"No description provided by the creator." }}</p>
+                    
+                    <div class="small text-muted d-flex flex-column gap-1 pt-2 border-top">
+                        <div><i class="fa-solid fa-folder me-2"></i>Category: <strong>{{ palette.business_category.name|default:"General" }}</strong></div>
+                        <div><i class="fa-solid fa-palette me-2"></i>Dominant Family: <strong>{{ palette.dominant_color_family.name|default:"Unknown" }}</strong></div>
+                        <div><i class="fa-regular fa-calendar me-2"></i>Created: {{ palette.created_at|date:"M d, Y" }}</div>
+                        {% if palette.published_at %}
+                            <div><i class="fa-solid fa-cloud-arrow-up me-2"></i>Published: {{ palette.published_at|date:"M d, Y" }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Statistics Summary -->
+                    <div class="row g-2 mt-3 pt-3 border-top text-center" style="font-size: 0.8rem;">
+                        <div class="col-4 border-end">
+                            <strong class="d-block h6 mb-0">{{ views_count }}</strong>
+                            <span class="text-muted text-uppercase" style="font-size: 0.65rem;">Views</span>
+                        </div>
+                        <div class="col-4 border-end">
+                            <strong class="d-block h6 mb-0">{{ copies_count }}</strong>
+                            <span class="text-muted text-uppercase" style="font-size: 0.65rem;">Copies</span>
+                        </div>
+                        <div class="col-4">
+                            <strong class="d-block h6 mb-0">{{ exports_count }}</strong>
+                            <span class="text-muted text-uppercase" style="font-size: 0.65rem;">Exports</span>
+                        </div>
+                    </div>
+
+                    <!-- Creator Details -->
+                    <div class="creator-profile-widget mt-4">
+                        <div class="creator-avatar" id="creator-initials-box">
+                            {% if palette.owner %}
+                                {{ palette.owner.username|slice:":2"|upper }}
+                            {% else %}
+                                SY
+                            {% endif %}
+                        </div>
+                        <div style="line-height: 1.2;">
+                            <span class="text-muted" style="font-size: 0.72rem; display:block;">CREATOR</span>
+                            {% if palette.owner %}
+                                <strong>{{ palette.owner.profile.display_name|default:palette.owner.username }}</strong>
+                                {% if palette.owner.profile.company_name %}
+                                    <div class="text-secondary small">{{ palette.owner.profile.company_name }}</div>
+                                {% endif %}
+                                <div class="text-muted small mt-1" style="font-size: 0.72rem;">
+                                    {{ owner_public_palettes_count }} public palettes &bull; Joined {{ palette.owner.date_joined|date:"M Y" }}
+                                </div>
+                            {% else %}
+                                <strong>System Preset</strong>
+                                <div class="text-secondary small">Skilite Default Template</div>
+                                <div class="text-muted small mt-1" style="font-size: 0.72rem;">
+                                    Built-in system preset
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Swatches Panel -->
+                <div class="palette-info-card shadow-sm">
+                    <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-swatchbook me-2 text-primary"></i>Semantic Swatches</h3>
+                    <div class="detail-swatch-list">
+                        {% for color in ordered_colors %}
+                            <div class="detail-swatch-row">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="detail-swatch-color-box" style="background-color: {{ color.hex_value }};"></div>
+                                    <span class="fw-bold text-heading">{{ color.get_role_display }}</span>
+                                </div>
+                                <code>{{ color.hex_value }}</code>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Accessibility Contrast Checker Panel -->
+                <div class="palette-info-card shadow-sm">
+                    <h3 class="h6 fw-bold mb-2"><i class="fa-solid fa-circle-half-stroke me-2 text-warning"></i>Contrast Summary</h3>
+                    <p class="text-muted small mb-3">Calculated dynamically against background & surface rules:</p>
+                    <div class="accessibility-card d-flex flex-column gap-2" id="contrast-checker-results">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Body Contrast</span>
+                            <span class="accessibility-badge" id="badge-body-contrast">Checking...</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Heading Contrast</span>
+                            <span class="accessibility-badge" id="badge-heading-contrast">Checking...</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Primary Button</span>
+                            <span class="accessibility-badge" id="badge-primary-contrast">Checking...</span>
+                        </div>
+                        <div class="pt-2 border-top mt-1 d-flex justify-content-between align-items-center">
+                            <strong>WCAG AA Status</strong>
+                            <strong class="text-success" id="overall-wcag-status">PASS</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Palette Copy & Export Actions -->
+                <div class="palette-info-card shadow-sm">
+                    <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-gears me-2 text-success"></i>Palette Actions</h3>
+                    
+                    {% if request.user.is_authenticated %}
+                        <form method="post" action="{% url 'community:copy' palette.slug %}" class="w-100 mb-3">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fa-solid fa-copy me-2"></i>Copy to My Palettes
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary w-100 mb-3">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i>Sign in to Copy
+                        </a>
+                    {% endif %}
+
+                    {% if palette.allow_export %}
+                        <div class="dropdown w-100">
+                            <button class="btn btn-outline-success w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-download me-2"></i>Export Palette Colors
+                            </button>
+                            <ul class="dropdown-menu w-100">
+                                <li><a class="dropdown-item" href="{% url 'community:export_palette' palette.slug 'CSS' %}">CSS Custom Properties</a></li>
+                                <li><a class="dropdown-item" href="{% url 'community:export_palette' palette.slug 'JSON' %}">JSON Format</a></li>
+                                <li><a class="dropdown-item" href="{% url 'community:export_palette' palette.slug 'SCSS' %}">SCSS Variables</a></li>
+                                <li><a class="dropdown-item" href="{% url 'community:export_palette' palette.slug 'BOOTSTRAP' %}">Bootstrap Overrides</a></li>
+                                <li><a class="dropdown-item" href="{% url 'community:export_palette' palette.slug 'TAILWIND' %}">Tailwind config block</a></li>
+                                <li><a class="dropdown-item" href="{% url 'community:export_palette' palette.slug 'REACT' %}">React Theme JS</a></li>
+                                <li><a class="dropdown-item" href="{% url 'community:export_palette' palette.slug 'ANDROID_COMPOSE' %}">Android Compose Colors</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <button type="button" class="btn btn-outline-secondary w-100" disabled>
+                            <i class="fa-solid fa-ban me-2"></i>Exporting Disabled by Owner
+                        </button>
+                    {% endif %}
+                </div>
+
+            {% endif %}
+
+            <!-- AREA 2: COMPLETE WEBSITE PREVIEW (RIGHT) -->
+            <section style="min-width: 0;">
+                <div class="preview-column">
+                    {% include "palettes/components/preview/preview_shell.html" %}
+                </div>
+            </section>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/palette-preview-content.js' %}"></script>
+<script src="{% static 'js/palette-preview-site.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Init colors map for the preview window
+        const colorMap = {
+            PRIMARY: "{{ preview_colors.PRIMARY }}",
+            SECONDARY: "{{ preview_colors.SECONDARY }}",
+            ACCENT: "{{ preview_colors.ACCENT }}",
+            BACKGROUND: "{{ preview_colors.BACKGROUND }}",
+            SURFACE: "{{ preview_colors.SURFACE }}",
+            HEADING: "{{ preview_colors.HEADING }}",
+            BODY_TEXT: "{{ preview_colors.BODY_TEXT }}",
+            MUTED_TEXT: "{{ preview_colors.MUTED_TEXT }}",
+            BORDER: "{{ preview_colors.BORDER }}",
+            SUCCESS: "{{ preview_colors.SUCCESS }}",
+            WARNING: "{{ preview_colors.WARNING }}",
+            DANGER: "{{ preview_colors.DANGER }}",
+            INFO: "{{ preview_colors.INFO }}"
+        };
+        const category = "{{ palette.business_category.slug|default:'default' }}";
+        const theme = "{{ palette.theme_mode }}";
+
+        // Set data-category & data-theme attributes on preview element for fallback tracking
+        const previewEl = document.getElementById("live-business-preview");
+        if (previewEl) {
+            previewEl.dataset.category = category;
+            previewEl.dataset.theme = theme;
+        }
+
+        // Initialize preview shell
+        window.SkilitePreview.setColors(colorMap);
+        window.SkilitePreview.setCategory(category);
+        window.SkilitePreview.setTheme(theme);
+        window.SkilitePreview.navigate('home');
+
+        // Dynamic Accessibility Contrast Checks
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function getLuminance(hex) {
+            const rgb = hexToRgb(hex);
+            if (!rgb) return 0;
+            const a = [rgb.r, rgb.g, rgb.b].map(v => {
+                v /= 255;
+                return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            });
+            return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+        }
+
+        function getContrast(hex1, hex2) {
+            const lum1 = getLuminance(hex1);
+            const lum2 = getLuminance(hex2);
+            return (Math.max(lum1, lum2) + 0.05) / (Math.min(lum1, lum2) + 0.05);
+        }
+
+        function runContrastAudits() {
+            const bg = colorMap.BACKGROUND || "#f8fafc";
+            const surface = colorMap.SURFACE || "#ffffff";
+            const primary = colorMap.PRIMARY || "#2563eb";
+            const heading = colorMap.HEADING || "#0f172a";
+            const body = colorMap.BODY_TEXT || "#334155";
+
+            const bodyContrast = getContrast(bg, body);
+            const headingContrast = getContrast(surface, heading);
+            const primaryContrast = getContrast(primary, "#ffffff"); // Assuming text white on primary buttons
+
+            // Render Results
+            const bodyEl = document.getElementById("badge-body-contrast");
+            const headingEl = document.getElementById("badge-heading-contrast");
+            const primaryEl = document.getElementById("badge-primary-contrast");
+            const statusEl = document.getElementById("overall-wcag-status");
+
+            let hasFail = false;
+
+            if (bodyContrast < 4.5) {
+                hasFail = true;
+            }
+            if (headingContrast < 3.0) {
+                hasFail = true;
+            }
+            if (primaryContrast < 3.0) {
+                hasFail = true;
+            }
+
+            if (bodyEl) {
+                if (bodyContrast >= 4.5) {
+                    bodyEl.className = "accessibility-badge badge-pass";
+                    bodyEl.textContent = `${bodyContrast.toFixed(1)}:1 Pass`;
+                } else {
+                    bodyEl.className = "accessibility-badge badge-fail";
+                    bodyEl.textContent = `${bodyContrast.toFixed(1)}:1 Fail`;
+                }
+            }
+
+            if (headingEl) {
+                if (headingContrast >= 3.0) {
+                    headingEl.className = "accessibility-badge badge-pass";
+                    headingEl.textContent = `${headingContrast.toFixed(1)}:1 Pass`;
+                } else {
+                    headingEl.className = "accessibility-badge badge-fail";
+                    headingEl.textContent = `${headingContrast.toFixed(1)}:1 Fail`;
+                }
+            }
+
+            if (primaryEl) {
+                if (primaryContrast >= 4.5) {
+                    primaryEl.className = "accessibility-badge badge-pass";
+                    primaryEl.textContent = `${primaryContrast.toFixed(1)}:1 Pass`;
+                } else if (primaryContrast >= 3.0) {
+                    primaryEl.className = "accessibility-badge badge-pass";
+                    primaryEl.textContent = `${primaryContrast.toFixed(1)}:1 AA Lg`;
+                } else {
+                    primaryEl.className = "accessibility-badge badge-fail";
+                    primaryEl.textContent = `${primaryContrast.toFixed(1)}:1 Fail`;
+                }
+            }
+
+            if (statusEl) {
+                if (hasFail) {
+                    statusEl.className = "text-danger";
+                    statusEl.textContent = "FAIL (AA)";
+                } else {
+                    statusEl.className = "text-success";
+                    statusEl.textContent = "PASS (AA)";
+                }
+            }
+        }
+
+        runContrastAudits();
+
+        // AJAX Like Toggling
+        const likeBtn = document.querySelector(".btn-like");
+        if (likeBtn) {
+            likeBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+                const slug = this.dataset.slug;
+                const heartIcon = this.querySelector("i");
+                const countSpan = this.querySelector(".like-count");
+                
+                // Fetch CSRF
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || "";
+                
+                fetch(`/community/like/${slug}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.liked) {
+                        this.classList.add("liked");
+                        heartIcon.className = "fa-solid fa-heart me-1";
+                    } else {
+                        this.classList.remove("liked");
+                        heartIcon.className = "fa-regular fa-heart me-1";
+                    }
+                    countSpan.textContent = data.likes_count;
+                })
+                .catch(err => console.error("Error toggling like:", err));
+            });
+        }
+
+        // Share Link functionality
+        const shareBtn = document.getElementById("btn-share-palette");
+        if (shareBtn) {
+            shareBtn.addEventListener("click", () => {
+                const url = window.location.href;
+                if (navigator.share) {
+                    navigator.share({
+                        title: "{{ palette.name }} Colors",
+                        url: url
+                    }).catch(err => console.log(err));
+                } else {
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert("Palette link copied to clipboard!");
+                    }).catch(err => {
+                        console.error("Failed to copy link:", err);
+                    });
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

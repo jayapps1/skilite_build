@@ -1,0 +1,95 @@
+{% extends "base/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}
+    Create Staff Admin | Skilite Build
+{% endblock %}
+
+{% block dashboard_title %}
+    Provision Staff Admin
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .create-admin-card {
+            max-width: 600px;
+            background-color: var(--surface-color, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .form-group-dashboard {
+            margin-bottom: 1.25rem;
+        }
+        .form-group-dashboard label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color, #0f172a);
+            display: block;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    <div class="page-heading mb-4">
+        <div>
+            <span class="page-badge bg-primary text-white">Superuser Control</span>
+            <h1 class="display-6 fw-bold mt-2 mb-2">Create Admin</h1>
+            <p class="text-secondary mb-0">Provision staff admin accounts with minimal privileges. Accounts are forced to change their default password on first login.</p>
+        </div>
+    </div>
+
+    <div class="create-admin-card">
+        <form method="post" action="{% url 'accounts:create_admin' %}" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="form-group-dashboard">
+                <label for="{{ form.username.id_for_label }}">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="text-danger small mt-1">
+                        {% for error in form.username.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group-dashboard">
+                <label for="{{ form.email.id_for_label }}">Email Address</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="text-danger small mt-1">
+                        {% for error in form.email.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group-dashboard">
+                <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                {{ form.phone_number }}
+                {% if form.phone_number.errors %}
+                    <div class="text-danger small mt-1">
+                        {% for error in form.phone_number.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+                <small class="form-text text-muted">
+                    Format: e.g. +233244123456 (Include country code, required for recovery).
+                </small>
+            </div>
+
+            <button type="submit" class="btn btn-primary py-2.5 px-4 mt-3">
+                <i class="fa-solid fa-user-plus me-2"></i>Provision Account
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

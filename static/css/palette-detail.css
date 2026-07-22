@@ -312,3 +312,10 @@
         width: 100%;
     }
 }
+
+.preview-column {
+    position: sticky;
+    top: 1.5rem;
+    width: 100%;
+    min-height: 600px;
+}
